@@ -1,0 +1,17 @@
+---
+// Сітка карток: на телефоні — одна колонка, ширше — 2, на компʼютері — columns.
+interface Props {
+  columns?: 2 | 3 | 4;
+}
+
+const { columns = 3 } = Astro.props;
+---
+
+<div
+  class:list={[
+    'grid grid-cols-1 gap-6 sm:grid-cols-2',
+    { 2: '', 3: 'lg:grid-cols-3', 4: 'lg:grid-cols-4' }[columns],
+  ]}
+>
+  <slot />
+</div>

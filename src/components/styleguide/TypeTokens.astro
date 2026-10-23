@@ -1,0 +1,63 @@
+---
+// Типографіка: шрифт, шкала розмірів тексту і накреслення — з theme.css.
+import { tokens, utilityFor } from '../../lib/theme-tokens';
+
+const sizeClass: Record<string, string> = {
+  xs: 'text-xs',
+  sm: 'text-sm',
+  base: 'text-base',
+  lg: 'text-lg',
+  xl: 'text-xl',
+  '2xl': 'text-2xl',
+  '3xl': 'text-3xl',
+  '4xl': 'text-4xl',
+  '5xl': 'text-5xl',
+};
+
+const weights = [
+  { label: 'Звичайний (font-normal)', cls: 'font-normal' },
+  { label: 'Напівжирний (font-semibold)', cls: 'font-semibold' },
+  { label: 'Жирний (font-bold)', cls: 'font-bold' },
+  { label: 'Дуже жирний (font-extrabold)', cls: 'font-extrabold' },
+];
+
+const sample = 'Ґанок, їжак і єнот ідуть на перевал';
+---
+
+<div>
+  {
+    tokens.font.map((t) => (
+      <p class="text-sm text-muted">
+        <span class="font-bold text-ink">font-{t.name}:</span> <code>{t.value}</code>
+      </p>
+    ))
+  }
+  <p class="mt-6 text-2xl break-all">
+    АБВГҐДЕЄЖЗИІЇЙКЛМНОПРСТУФХЦЧШЩЬЮЯ<br />абвгґдеєжзиіїйклмнопрстуфхцчшщьюя<br />0123456789 «» — ’ № ₴
+  </p>
+</div>
+
+<h4 class="mt-10 font-bold">Розміри тексту</h4>
+<ul class="mt-4 flex flex-col gap-4">
+  {
+    tokens.text.map((t) => (
+      <li class="flex flex-col gap-1 border-b border-line/40 pb-4 sm:flex-row sm:items-baseline sm:gap-6">
+        <code class="w-32 shrink-0 text-sm text-muted">
+          text-{t.name} · {t.value}
+        </code>
+        <span class:list={['min-w-0 font-semibold', utilityFor(sizeClass, 'text', t.name)]}>{sample}</span>
+      </li>
+    ))
+  }
+</ul>
+
+<h4 class="mt-10 font-bold">Накреслення</h4>
+<ul class="mt-4 flex flex-col gap-2 text-lg">
+  {
+    weights.map((w) => (
+      <li class={w.cls}>
+        {w.label} — {sample}
+      </li>
+    ))
+  }
+</ul>

@@ -1,0 +1,42 @@
+---
+// Блок «напрями діяльності»: іконка, назва, короткий опис; назва може вести на сторінку.
+import Icon from './Icon.astro';
+import type { IconName } from '../lib/icons';
+
+export interface Activity {
+  icon: IconName;
+  title: string;
+  text: string;
+  href?: string;
+}
+
+interface Props {
+  items: Activity[];
+}
+
+const { items } = Astro.props;
+---
+
+<ul class="grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-3">
+  {
+    items.map((item) => (
+      <li class="relative flex gap-4 rounded-lg border border-line/40 bg-paper p-5">
+        <span class="flex size-12 shrink-0 items-center justify-center rounded-full bg-brand-soft text-brand">
+          <Icon name={item.icon} size={26} />
+        </span>
+        <div>
+          <h3 class="text-lg font-bold text-ink">
+            {item.href ? (
+              <a class="after:absolute after:inset-0 hover:text-brand" href={item.href}>
+                {item.title}
+              </a>
+            ) : (
+              item.title
+            )}
+          </h3>
+          <p class="mt-1 text-muted">{item.text}</p>
+        </div>
+      </li>
+    ))
+  }
+</ul>

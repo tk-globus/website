@@ -1,9 +1,7 @@
 // Смоук-тест зібраного сайту: сторінка відкривається, банер прототипу й noindex на місці.
 import { test, expect } from '@playwright/test';
 import settings from '../../src/data/settings.json' with { type: 'json' };
-
-// Кожен новий маршрут додається сюди — і отримує ті самі базові перевірки.
-const routes = ['/'];
+import { routes } from './routes';
 
 for (const route of routes) {
   test(`${route}: відкривається, є банер прототипу, noindex, шапка й підвал`, async ({ page }) => {

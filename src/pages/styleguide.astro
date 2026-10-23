@@ -1,0 +1,228 @@
+---
+// Дизайн-система (ADR 0003): усі токени й компоненти з прикладами. Редизайн починається звідси.
+// Новий компонент бібліотеки → додай сюди зразок.
+import BaseLayout from '../layouts/BaseLayout.astro';
+import Activities, { type Activity } from '../components/Activities.astro';
+import Breadcrumbs from '../components/Breadcrumbs.astro';
+import Button from '../components/Button.astro';
+import Card from '../components/Card.astro';
+import CardGrid from '../components/CardGrid.astro';
+import Cluster from '../components/Cluster.astro';
+import EmptyState from '../components/EmptyState.astro';
+import Hero from '../components/Hero.astro';
+import PageHeader from '../components/PageHeader.astro';
+import Prose from '../components/Prose.astro';
+import Section from '../components/Section.astro';
+import Tag from '../components/Tag.astro';
+import ColorTokens from '../components/styleguide/ColorTokens.astro';
+import IconList from '../components/styleguide/IconList.astro';
+import ShapeTokens from '../components/styleguide/ShapeTokens.astro';
+import SpacingTokens from '../components/styleguide/SpacingTokens.astro';
+import Specimen from '../components/styleguide/Specimen.astro';
+import Toc from '../components/styleguide/Toc.astro';
+import TypeTokens from '../components/styleguide/TypeTokens.astro';
+import petros from '../assets/styleguide/petros.jpg';
+import korostyshiv from '../assets/styleguide/korostyshiv.jpg';
+
+const sections = [
+  { id: 'colors', label: 'Кольори' },
+  { id: 'type', label: 'Типографіка' },
+  { id: 'spacing', label: 'Відступи' },
+  { id: 'shapes', label: 'Радіуси й тіні' },
+  { id: 'buttons', label: 'Кнопки' },
+  { id: 'tags', label: 'Мітки й іконки' },
+  { id: 'cards', label: 'Картки' },
+  { id: 'activities', label: 'Напрями' },
+  { id: 'sections', label: 'Секції' },
+  { id: 'hero', label: 'Герой' },
+  { id: 'navigation', label: 'Навігація' },
+  { id: 'empty', label: 'Порожній стан' },
+  { id: 'prose', label: 'Текст' },
+];
+
+// Приклади — для показу компонентів; справжні тексти напрямів зʼявляться на головній (тікет 04).
+const activities: Activity[] = [
+  { icon: 'mountain', title: 'Походи', text: 'Від вихідних у Карпатах до категорійних маршрутів на Кавказі.' },
+  { icon: 'book', title: 'Навчальні секції', text: 'Група А і Група Б: тренування, теорія, навчальні виїзди.' },
+  { icon: 'tent', title: 'Табір «Глобус»', text: 'Літній табір і школа інструкторів.' },
+  { icon: 'flag', title: 'Змагання', text: 'Туристичні змагання й ралі для команд клубу.' },
+  { icon: 'campfire', title: 'Клубні вечори', text: 'Щомісяця: розповіді з походів, фото, знайомства.' },
+];
+---
+
+<BaseLayout title="Дизайн-система" description="Кольори, шрифти й компоненти сайту турклубу «Глобус».">
+  <PageHeader
+    title="Дизайн-система"
+    lead="Усі кольори, шрифти й компоненти сайту на одній сторінці. Редизайн починається тут: змінюємо токени в src/styles/theme.css — і бачимо результат."
+    breadcrumbs={[{ label: 'Дизайн-система' }]}
+  >
+    <Toc items={sections} />
+  </PageHeader>
+
+  <Section id="colors" title="Кольори" intro="Палітра — з логотипа «Глобуса». Бірюзовий — основний, жовтий — для найважливішого.">
+    <ColorTokens />
+  </Section>
+
+  <Section id="type" tone="surface" title="Типографіка" intro="Шрифт Manrope: повна українська абетка, спокійні геометричні форми.">
+    <TypeTokens />
+  </Section>
+
+  <Section id="spacing" title="Відступи">
+    <SpacingTokens />
+  </Section>
+
+  <Section id="shapes" tone="surface" title="Радіуси, тіні, ширини">
+    <ShapeTokens />
+  </Section>
+
+  <Section id="buttons" title="Кнопки" intro="Основна — головна дія на екрані (одна). Вторинна — додаткові дії.">
+    <Specimen title="Основна і вторинна" usage={'<Button href="/join">…</Button> · <Button variant="secondary">'}>
+      <Cluster>
+        <Button href="/styleguide">Долучитися</Button>
+        <Button href="/styleguide" variant="secondary">Усі новини</Button>
+        <Button href="/styleguide" icon="arrow-right">З іконкою</Button>
+      </Cluster>
+    </Specimen>
+    <Specimen title="Великі" usage={'<Button size="lg">'}>
+      <Cluster>
+        <Button href="/styleguide" size="lg">Долучитися</Button>
+        <Button href="/styleguide" size="lg" variant="secondary">Про клуб</Button>
+      </Cluster>
+    </Specimen>
+    <Specimen title="Неактивна (сторінки ще немає)" usage={'<Button href={null}>'}>
+      <Cluster>
+        <Button href={null}>Долучитися</Button>
+        <Button href={null} variant="secondary">Бібліотека</Button>
+      </Cluster>
+    </Specimen>
+  </Section>
+
+  <Section id="tags" tone="surface" title="Мітки й іконки">
+    <Specimen title="Мітки" usage={'<Tag tone="brand | accent | neutral">'}>
+      <Cluster gap="sm">
+        <Tag>Карпати</Tag>
+        <Tag>пішохідний</Tag>
+        <Tag tone="accent">2 к.с.</Tag>
+        <Tag tone="neutral">2024</Tag>
+      </Cluster>
+    </Specimen>
+    <Specimen title="Іконки" usage={'<Icon name="mountain" />'}>
+      <IconList />
+    </Specimen>
+  </Section>
+
+  <Section
+    id="cards"
+    title="Картки й сітка"
+    intro="Базова картка — основа для карток новини, події й звіту. Сітка: 1 колонка на телефоні, 2 — на планшеті, 3 — на компʼютері."
+  >
+    <CardGrid>
+      <Card
+        href="/styleguide"
+        image={korostyshiv}
+        imageAlt="Учасники клубу на виїзді в Коростишеві"
+        title="Навчальний виїзд Групи А в Коростишів"
+        description="Перші вузли, переправа і ночівля в наметах: як минув осінній виїзд новачків."
+      >
+        <Fragment slot="meta">29 вересня 2026</Fragment>
+      </Card>
+      <Card href="/styleguide" title="«Осінній лист 2026»" description="Традиційні клубні змагання з туристичної техніки.">
+        <Fragment slot="meta"><Tag tone="accent">майбутня</Tag> 15–16 листопада 2026</Fragment>
+        <Fragment slot="footer">Київська обл.</Fragment>
+      </Card>
+      <Card
+        href="/styleguide"
+        image={petros}
+        imageAlt="Група на вершині Петроса"
+        title="Пішохідний похід 2 к.с. Чорногорою"
+        description="Ворохта — Говерла — Петрос — Кваси."
+      >
+        <Fragment slot="meta"><Tag>Карпати</Tag><Tag>пішохідний</Tag><Tag tone="accent">2 к.с.</Tag></Fragment>
+        <Fragment slot="footer">2024 · керівник: І. Прізвище</Fragment>
+      </Card>
+    </CardGrid>
+  </Section>
+
+  <Section id="activities" tone="surface" title="Напрями діяльності" intro="Блок для головної: чим займається клуб.">
+    <Activities items={activities} />
+  </Section>
+
+  <Section id="sections" title="Секції" intro="Сторінка складається з секцій. Фон чергується, щоб розділити блоки.">
+    <Specimen title="Секція на світлому фоні" usage={'<Section tone="surface" title="…" intro="…">'} bleed>
+      <Section tone="surface" title="Найближчі події" intro="Вступ до секції — одне-два речення.">
+        <Button href="/styleguide" variant="secondary" slot="action" icon="arrow-right">Усі події</Button>
+        <Prose><p>Вміст секції.</p></Prose>
+      </Section>
+    </Specimen>
+    <Specimen title="Секція на бірюзовому фоні" usage={'<Section tone="brand">'} bleed>
+      <Section tone="brand" title="Долучайтеся до клубу" intro="Вік і вуз не важливі — важливе бажання ходити в гори.">
+        <Button href="/styleguide" variant="secondary" size="lg">Долучитися</Button>
+      </Section>
+    </Specimen>
+  </Section>
+
+  <Section id="hero" tone="surface" title="Секція-герой" intro="Перший екран головної: велике фото, заголовок, головна дія.">
+    <Specimen title="Герой із фото" usage={'<Hero image={photo} alt="…" title="…" lead="…">'} bleed>
+      <Hero
+        headingLevel={2}
+        image={petros}
+        alt="Учасниці клубу на вершині Петроса в Чорногорі"
+        title="Турклуб КПІ «Глобус»"
+        lead="Некомерційний туристський клуб з 1952 року. Відкритий для всіх."
+      >
+        <Button href="/styleguide" size="lg">Долучитися</Button>
+        <Button href="/styleguide" size="lg" variant="secondary">Про клуб</Button>
+      </Hero>
+    </Specimen>
+  </Section>
+
+  <Section id="navigation" title="Навігація">
+    <Specimen title="Хлібні крихти" usage={'<Breadcrumbs items={[{ label, href }]} />'}>
+      <Breadcrumbs items={[{ label: 'Бібліотека', href: '/styleguide' }, { label: 'Пішохідний похід 2 к.с. Чорногорою' }]} />
+    </Specimen>
+    <Specimen title="Шапка сторінки" usage={'<PageHeader title="…" lead="…" breadcrumbs={…} />'} bleed>
+      <PageHeader
+        title="Бібліотека звітів"
+        lead="Звіти про походи учасників клубу: райони, види туризму, категорії складності."
+        breadcrumbs={[{ label: 'Бібліотека' }]}
+      />
+    </Specimen>
+    <Specimen title="Шапка сайту й підвал">
+      <Prose>
+        <p>Угорі й унизу цієї сторінки. На телефоні меню ховається під кнопку «Меню».</p>
+      </Prose>
+    </Specimen>
+  </Section>
+
+  <Section id="empty" tone="surface" title="Порожній стан">
+    <Specimen title="Нічого не знайдено" usage={'<EmptyState title="…" text="…">'}>
+      <EmptyState title="Звітів не знайдено" text="Спробуйте прибрати частину фільтрів.">
+        <Button href="/styleguide" variant="secondary">Скинути фільтри</Button>
+      </EmptyState>
+    </Specimen>
+  </Section>
+
+  <Section id="prose" title="Довгий текст" intro="Тіло новини, сторінки чи звіту.">
+    <Specimen title="Текст" usage={'<Prose>…</Prose>'}>
+      <Prose>
+        <p>
+          Турклуб «Глобус» засновано в 1952 році при КПІ. Клуб <a href="/styleguide">відкритий для всіх</a>: вік і
+          «вузівська приналежність» не важливі.
+        </p>
+        <h2>Як ми ходимо в походи</h2>
+        <p>Кожен похід готує група з керівником, маршрут перевіряє МКК.</p>
+        <ul>
+          <li>некатегорійні походи вихідного дня;</li>
+          <li>категорійні походи 1–6 к.с.;</li>
+          <li>навчальні виїзди для новачків.</li>
+        </ul>
+        <h3>Що взяти в перший похід</h3>
+        <ol>
+          <li>Рюкзак, спальник, каремат.</li>
+          <li>Зручне взуття й дощовик.</li>
+        </ol>
+        <blockquote>Гори кличуть — і треба йти.</blockquote>
+      </Prose>
+    </Specimen>
+  </Section>
+</BaseLayout>

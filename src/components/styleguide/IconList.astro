@@ -1,0 +1,16 @@
+---
+// Усі іконки з компонента Icon.
+import Icon from '../Icon.astro';
+import { iconNames } from '../../lib/icons';
+---
+
+<ul class="grid grid-cols-3 gap-4 sm:grid-cols-5 lg:grid-cols-7">
+  {
+    iconNames.map((name) => (
+      <li class="flex flex-col items-center gap-2 text-brand">
+        <Icon name={name} size={28} />
+        <code class="text-xs text-muted">{name}</code>
+      </li>
+    ))
+  }
+</ul>

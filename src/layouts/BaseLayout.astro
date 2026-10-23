@@ -1,5 +1,6 @@
 ---
 // Базовий макет: кожна сторінка обгортається ним. Тут — noindex, банер прототипу, шапка й підвал.
+// Вміст сторінки складається з секцій-компонентів (Section, Hero, PageHeader…), кожна сама тримає колонку.
 import '../styles/global.css';
 import PrototypeBanner from '../components/PrototypeBanner.astro';
 import SiteHeader from '../components/SiteHeader.astro';
@@ -26,9 +27,15 @@ const fullTitle = title ? `${title} — ${settings.shortName}` : settings.name;
     <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
   </head>
   <body class="flex min-h-screen flex-col">
+    <a
+      href="#main"
+      class="sr-only focus:not-sr-only focus:absolute focus:top-2 focus:left-2 focus:z-50 focus:rounded-md focus:bg-paper focus:px-4 focus:py-2 focus:shadow-lg"
+    >
+      Перейти до змісту
+    </a>
     <PrototypeBanner />
     <SiteHeader />
-    <main class="mx-auto w-full max-w-page flex-1 px-4 py-8">
+    <main id="main" class="flex-1">
       <slot />
     </main>
     <SiteFooter />

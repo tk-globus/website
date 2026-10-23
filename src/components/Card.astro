@@ -1,0 +1,68 @@
+---
+// Базова картка: фото (необовʼязкове), мета-рядок, заголовок, опис, низ картки.
+// На ній будуються картки новини, події та звіту (тікети 05b, 06, 07).
+// Якщо є href — уся картка клікабельна (посилання на заголовку розтягнуте на картку),
+// тож у слотах не варто ставити інші посилання.
+import type { ImageMetadata } from 'astro';
+import { Image } from 'astro:assets';
+
+interface Props {
+  title: string;
+  href?: string;
+  description?: string;
+  image?: ImageMetadata;
+  imageAlt?: string;
+  headingLevel?: 2 | 3;
+}
+
+const { title, href, description, image, imageAlt = '', headingLevel = 3 } = Astro.props;
+const Heading = `h${headingLevel}` as const;
+---
+
+<article
+  class:list={[
+    'group relative flex flex-col overflow-hidden rounded-lg border border-line/40 bg-paper shadow-sm',
+    href && 'transition-shadow hover:shadow-md',
+  ]}
+>
+  {
+    image && (
+      <Image
+        src={image}
+        alt={imageAlt}
+        widths={[...new Set([400, 800].map((w) => Math.min(w, image.width)))]}
+        sizes="(min-width: 1024px) 24rem, (min-width: 640px) 50vw, 100vw"
+        class="aspect-3/2 w-full object-cover"
+      />
+    )
+  }
+  <div class="flex flex-1 flex-col gap-2 p-5">
+    {
+      Astro.slots.has('meta') && (
+        <div class="flex flex-wrap items-center gap-2 text-sm text-muted">
+          <slot name="meta" />
+        </div>
+      )
+    }
+    <Heading class="text-lg font-bold leading-snug">
+      {
+        href ? (
+          <a class="after:absolute after:inset-0 group-hover:text-brand" href={href}>
+            {title}
+          </a>
+        ) : (
+          title
+        )
+      }
+    </Heading>
+    {description && <p class="line-clamp-3 text-muted">{description}</p>}
+    <slot />
+    {
+      Astro.slots.has('footer') && (
+        <div class="mt-auto flex flex-wrap items-center gap-2 pt-2 text-sm">
+          <slot name="footer" />
+        </div>
+      )
+    }
+  </div>
+</article>

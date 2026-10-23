@@ -18,6 +18,7 @@
     "check": "npm run lint:tokens && npm run test:scripts && npm run build && npm run check:links && npm run test:smoke"
   },
   "dependencies": {
+    "@fontsource-variable/manrope": "^5.3.0",
     "@tailwindcss/vite": "^4.3.3",
     "astro": "^7.4.2",
     "tailwindcss": "^4.3.3"

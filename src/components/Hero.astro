@@ -1,0 +1,44 @@
+---
+// Секція-герой: велике фото на всю ширину, затемнення знизу, заголовок, вступ і кнопки (слот).
+// Фото — з src/assets (Astro сам стисне й нарізає під різні екрани).
+import type { ImageMetadata } from 'astro';
+import { Image } from 'astro:assets';
+import Container from './Container.astro';
+
+interface Props {
+  image: ImageMetadata;
+  /** Опис фото для незрячих: хто й де на ньому. */
+  alt: string;
+  title: string;
+  lead?: string;
+  /** 1 — головний заголовок сторінки (за замовчуванням); 2 — коли герой не перший на сторінці. */
+  headingLevel?: 1 | 2;
+}
+
+const { image, alt, title, lead, headingLevel = 1 } = Astro.props;
+const Heading = `h${headingLevel}` as const;
+---
+
+<section class="relative isolate overflow-hidden bg-ink text-on-brand">
+  <Image
+    src={image}
+    alt={alt}
+    widths={[640, 960, 1280, 1920, 2560].filter((w) => w < image.width).concat(image.width)}
+    sizes="100vw"
+    loading="eager"
+    fetchpriority="high"
+    class="absolute inset-0 -z-10 size-full object-cover"
+  />
+  <div class="absolute inset-0 -z-10 bg-linear-to-t from-ink/80 via-ink/35 to-ink/5" aria-hidden="true"></div>
+  <Container class="flex min-h-96 flex-col justify-end py-12 md:min-h-128 md:py-16">
+    <Heading class="max-w-text text-3xl font-extrabold md:text-5xl">{title}</Heading>
+    {lead && <p class="mt-4 max-w-text text-lg text-on-brand/90 md:text-xl">{lead}</p>}
+    {
+      Astro.slots.has('default') && (
+        <div class="mt-8 flex flex-wrap gap-3">
+          <slot />
+        </div>
+      )
+    }
+  </Container>
+</section>

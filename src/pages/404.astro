@@ -1,0 +1,22 @@
+---
+// Сторінка «не знайдено». Cloudflare Pages віддає dist/404.html зі статусом 404 на будь-яку неіснуючу адресу.
+import BaseLayout from '../layouts/BaseLayout.astro';
+import Section from '../components/Section.astro';
+import EmptyState from '../components/EmptyState.astro';
+import Button from '../components/Button.astro';
+import { settings } from '../lib/settings';
+---
+
+<BaseLayout title="Сторінку не знайдено">
+  <Section>
+    <EmptyState
+      headingLevel={1}
+      icon="compass"
+      title="Сторінку не знайдено"
+      text="Схоже, ця стежка нікуди не веде: адреса змінилася або такої сторінки в прототипі ще немає."
+    >
+      <Button href="/" icon="arrow-right">На головну</Button>
+      <Button href={settings.channels.oldSite} variant="secondary">Старий сайт клубу</Button>
+    </EmptyState>
+  </Section>
+</BaseLayout>

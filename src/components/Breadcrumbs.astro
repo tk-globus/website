@@ -1,0 +1,40 @@
+---
+// Хлібні крихти: «Головна › Розділ › Сторінка». «Головна» додається сама;
+// останній пункт — поточна сторінка (без посилання).
+import Icon from './Icon.astro';
+
+export interface Crumb {
+  label: string;
+  href?: string;
+}
+
+interface Props {
+  items: Crumb[];
+}
+
+const crumbs: Crumb[] = [{ label: 'Головна', href: '/' }, ...Astro.props.items];
+---
+
+<nav aria-label="Хлібні крихти">
+  <ol class="flex flex-wrap items-center gap-1 text-sm text-muted">
+    {
+      crumbs.map((crumb, i) => {
+        const isLast = i === crumbs.length - 1;
+        return (
+          <li class="flex items-center gap-1">
+            {isLast || !crumb.href ? (
+              <span aria-current={isLast ? 'page' : undefined} class:list={[isLast && 'text-ink']}>
+                {crumb.label}
+              </span>
+            ) : (
+              <a class="underline-offset-2 hover:text-brand hover:underline" href={crumb.href}>
+                {crumb.label}
+              </a>
+            )}
+            {!isLast && <Icon name="chevron-right" size={14} />}
+          </li>
+        );
+      })
+    }
+  </ol>
+</nav>

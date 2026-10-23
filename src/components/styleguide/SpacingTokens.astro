@@ -1,0 +1,35 @@
+---
+// Шкала відступів: крок із theme.css і вживані кроки (p-4 = 4 кроки).
+import { tokens } from '../../lib/theme-tokens';
+
+const step = tokens.spacing[0];
+const steps = [
+  { n: 1, cls: 'w-1' },
+  { n: 2, cls: 'w-2' },
+  { n: 3, cls: 'w-3' },
+  { n: 4, cls: 'w-4' },
+  { n: 6, cls: 'w-6' },
+  { n: 8, cls: 'w-8' },
+  { n: 12, cls: 'w-12' },
+  { n: 16, cls: 'w-16' },
+  { n: 24, cls: 'w-24' },
+];
+const stepRem = parseFloat(step.value);
+---
+
+<p class="text-muted">
+  Один крок — <code class="text-ink">{step.value}</code>. Відступ <code class="text-ink">p-4</code> = 4 кроки. Вживаємо
+  кроки:
+</p>
+<ul class="mt-4 flex flex-col gap-2">
+  {
+    steps.map((s) => (
+      <li class="flex items-center gap-4">
+        <code class="w-28 shrink-0 text-sm text-muted">
+          {s.n} · {s.n * stepRem}rem
+        </code>
+        <span class:list={['h-4 rounded-sm bg-brand-cyan', s.cls]} />
+      </li>
+    ))
+  }
+</ul>

@@ -1,0 +1,29 @@
+---
+// Іконки — лінійні, у стилі логотипа. Колір береться з тексту (currentColor), розмір — з пропа.
+// Шляхи іконок і їхні назви — у src/lib/icons.ts.
+import type { HTMLAttributes } from 'astro/types';
+import { iconPaths, type IconName } from '../lib/icons';
+
+interface Props extends HTMLAttributes<'svg'> {
+  name: IconName;
+  size?: number;
+}
+
+const { name, size = 24, ...rest } = Astro.props;
+---
+
+<svg
+  xmlns="http://www.w3.org/2000/svg"
+  viewBox="0 0 24 24"
+  width={size}
+  height={size}
+  fill="none"
+  stroke="currentColor"
+  stroke-width="1.75"
+  stroke-linecap="round"
+  stroke-linejoin="round"
+  aria-hidden="true"
+  focusable="false"
+  {...rest}
+  set:html={iconPaths[name]}
+/>
