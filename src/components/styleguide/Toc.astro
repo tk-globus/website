@@ -13,7 +13,7 @@ const { items } = Astro.props;
       items.map((item) => (
         <li>
           <a
-            class="block rounded-full border border-line/60 bg-paper px-3 py-1 text-sm font-semibold hover:border-brand hover:text-brand"
+            class="block rounded-full border border-line/medium bg-paper px-3 py-1 text-sm font-semibold hover:border-brand hover:text-brand"
             href={`#${item.id}`}
           >
             {item.label}

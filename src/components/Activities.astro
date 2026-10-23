@@ -17,10 +17,10 @@ interface Props {
 const { items } = Astro.props;
 ---
 
-<ul class="grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-3">
+<ul data-component="Activities" class="grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-3">
   {
     items.map((item) => (
-      <li class="relative flex gap-4 rounded-lg border border-line/40 bg-paper p-5">
+      <li class="relative flex gap-4 rounded-lg border border-line/soft bg-paper p-5">
         <span class="flex size-12 shrink-0 items-center justify-center rounded-full bg-brand-soft text-brand">
           <Icon name={item.icon} size={26} />
         </span>

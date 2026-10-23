@@ -19,14 +19,14 @@ const legacyLinks = [
   { label: 'Форум', href: channels.forum },
 ];
 
-const linkClass = 'underline-offset-2 hover:text-accent hover:underline';
+const linkClass = 'underline-offset-link hover:text-accent hover:underline';
 ---
 
-<footer class="bg-brand text-on-brand">
+<footer data-component="SiteFooter" class="bg-brand text-on-brand">
   <Container class="grid gap-8 py-12 text-sm md:grid-cols-3">
     <div>
       <p class="text-lg font-bold">{settings.name}</p>
-      <p class="mt-2 text-on-brand/85">{settings.description}</p>
+      <p class="mt-2 text-on-brand/muted">{settings.description}</p>
     </div>
     <div>
       <h2 class="font-bold">Канали клубу</h2>

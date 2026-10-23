@@ -21,8 +21,8 @@ const swatch: Record<string, string> = {
 <ul class="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-3">
   {
     tokens.color.map((t) => (
-      <li class="flex items-center gap-4" data-testid="color-token">
-        <span class:list={['size-16 shrink-0 rounded-md border border-line/60', utilityFor(swatch, 'color', t.name)]} />
+      <li class="flex items-center gap-4" data-testid="color-token" data-token={t.variable}>
+        <span class:list={['size-16 shrink-0 rounded-md border border-line/medium', utilityFor(swatch, 'color', t.name)]} />
         <span class="min-w-0">
           <span class="block font-bold">{t.name}</span>
           <code class="block text-sm text-muted">{t.value}</code>

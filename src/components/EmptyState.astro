@@ -15,7 +15,10 @@ const { title, text, icon = 'search', headingLevel = 3 } = Astro.props;
 const Heading = `h${headingLevel}` as const;
 ---
 
-<div class="flex flex-col items-center rounded-lg border-2 border-dashed border-line/60 px-6 py-12 text-center">
+<div
+  data-component="EmptyState"
+  class="flex flex-col items-center rounded-lg border-thick border-dashed border-line/medium px-6 py-12 text-center"
+>
   <span class="flex size-16 items-center justify-center rounded-full bg-brand-soft text-brand">
     <Icon name={icon} size={32} />
   </span>

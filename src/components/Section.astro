@@ -16,6 +16,7 @@ const hasAction = Astro.slots.has('action');
 ---
 
 <section
+  data-component="Section"
   id={id}
   class:list={[
     { paper: 'bg-paper', surface: 'bg-surface', brand: 'bg-brand text-on-brand' }[tone],
@@ -28,7 +29,7 @@ const hasAction = Astro.slots.has('action');
           <div>
             {title && <h2 class="text-2xl font-bold md:text-3xl">{title}</h2>}
             {intro && (
-              <p class:list={['mt-2 max-w-text text-lg', tone === 'brand' ? 'text-on-brand/85' : 'text-muted']}>
+              <p class:list={['mt-2 max-w-text text-lg', tone === 'brand' ? 'text-on-brand/muted' : 'text-muted']}>
                 {intro}
               </p>
             )}
