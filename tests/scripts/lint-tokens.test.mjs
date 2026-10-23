@@ -36,6 +36,13 @@ test('ловить числа в обхід теми: прозорість, ви
   assert.deepEqual(found('<p class="duration-300">'), ['duration-300']);
 });
 
+test('ловить довільне значення після «/»: прозорість і висоту рядка', () => {
+  assert.deepEqual(found('<p class="bg-brand/[0.3]">'), ['bg-brand/[0.3]']);
+  assert.deepEqual(found('<p class="text-sm/[1.3]">'), ['text-sm/[1.3]']);
+  assert.deepEqual(found('<p class="hover:border-line/[.4]">'), ['border-line/[.4]']);
+  assert.deepEqual(found('<p class="border-line/soft w-1/2 aspect-3/2">'), []);
+});
+
 test('пропускає іменовані токени й нульові значення', () => {
   assert.deepEqual(found('<p class="border-line/soft text-on-brand/muted from-ink/scrim-strong">'), []);
   assert.deepEqual(found('<p class="opacity-disabled opacity-0 opacity-100 border-thick border-0 border">'), []);
