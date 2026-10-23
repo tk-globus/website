@@ -1,0 +1,10 @@
+---
+// Банер «це прототип» — на кожній сторінці (спека, «Прототипні обмеження»).
+import { settings } from '../lib/settings';
+
+const { text, linkText } = settings.prototypeBanner;
+---
+
+<div class="bg-accent px-4 py-2 text-center text-sm text-ink" data-testid="prototype-banner">
+  {text}{' '}<a class="font-semibold underline" href={settings.channels.oldSite}>{linkText}</a>
+</div>

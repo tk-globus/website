@@ -1,0 +1,41 @@
+---
+// Шапка: логотип, меню, кнопка «Долучитися». Пункти — у src/lib/nav.ts.
+// Тікет 03 переведе на компоненти бібліотеки і додасть згортання меню на телефоні.
+import logo from '../assets/logo.svg';
+import { settings } from '../lib/settings';
+import { mainNav, joinLink } from '../lib/nav';
+---
+
+<header class="border-b border-line">
+  <div class="mx-auto flex max-w-page flex-wrap items-center justify-between gap-4 px-4 py-3">
+    <a href="/" class="block">
+      <img src={logo.src} alt={settings.name} width={logo.width} height={logo.height} class="h-10 w-auto" />
+    </a>
+    <nav aria-label="Головне меню">
+      <ul class="flex flex-wrap items-center gap-x-4 gap-y-1 text-sm">
+        {
+          mainNav.map((item) => (
+            <li>
+              {item.href ? (
+                <a class="hover:text-brand" href={item.href}>{item.label}</a>
+              ) : (
+                <span class="text-muted" title="Сторінка в розробці">{item.label}</span>
+              )}
+            </li>
+          ))
+        }
+      </ul>
+    </nav>
+    {
+      joinLink.href ? (
+        <a class="rounded bg-brand px-4 py-2 text-sm font-semibold text-on-brand" href={joinLink.href}>
+          {joinLink.label}
+        </a>
+      ) : (
+        <span class="rounded bg-brand px-4 py-2 text-sm font-semibold text-on-brand opacity-60" title="Сторінка в розробці">
+          {joinLink.label}
+        </span>
+      )
+    }
+  </div>
+</header>

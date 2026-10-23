@@ -1,0 +1,32 @@
+---
+// Підвал: канали клубу, адреса, старий сайт і форум — усе з налаштувань.
+import { settings } from '../lib/settings';
+
+const { channels } = settings;
+
+const links = [
+  { label: 'Telegram-чат', href: channels.telegram },
+  { label: 'Instagram', href: channels.instagram },
+  { label: 'YouTube', href: channels.youtube },
+  { label: 'Facebook', href: channels.facebook },
+  { label: channels.email, href: `mailto:${channels.email}` },
+  { label: 'Старий сайт', href: channels.oldSite },
+  { label: 'Форум', href: channels.forum },
+];
+---
+
+<footer class="mt-16 bg-brand text-on-brand">
+  <div class="mx-auto flex max-w-page flex-col gap-4 px-4 py-8 text-sm">
+    <p class="font-semibold">{settings.name}</p>
+    <ul class="flex flex-wrap gap-x-6 gap-y-2" data-testid="channels">
+      {
+        links.map((link) => (
+          <li>
+            <a class="underline" href={link.href}>{link.label}</a>
+          </li>
+        ))
+      }
+    </ul>
+    <p>{settings.address}</p>
+  </div>
+</footer>

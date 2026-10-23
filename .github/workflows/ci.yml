@@ -1,0 +1,52 @@
+name: CI
+
+on:
+  pull_request:
+  push:
+    branches: [main]
+
+concurrency:
+  group: ci-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  checks:
+    name: Збірка і перевірки
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@v7
+
+      - uses: actions/setup-node@v7
+        with:
+          node-version-file: .nvmrc
+          cache: npm
+
+      - name: Встановити залежності
+        run: npm ci
+
+      - name: Лінт «тільки токени»
+        run: npm run lint:tokens
+
+      - name: Тести скриптів
+        run: npm run test:scripts
+
+      - name: Збірка (з валідацією контенту)
+        run: npm run build
+
+      - name: Внутрішні посилання
+        run: npm run check:links
+
+      - name: Встановити браузер для смоук-тестів
+        run: npx playwright install --with-deps chromium
+
+      - name: Смоук-тести
+        run: npm run test:smoke
+
+      - name: Звіт смоук-тестів
+        if: failure()
+        uses: actions/upload-artifact@v7
+        with:
+          name: playwright-report
+          path: playwright-report/
+          retention-days: 7
