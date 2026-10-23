@@ -1,5 +1,6 @@
 ---
-// Іконки — лінійні, у стилі логотипа. Колір береться з тексту (currentColor), розмір — з пропа.
+// Іконки — лінійні, у стилі логотипа. Колір береться з тексту (currentColor), розмір — з пропа,
+// товщина ліній — з теми (утиліта stroke-icon, токен --stroke-width-icon).
 // Шляхи іконок і їхні назви — у src/lib/icons.ts.
 import type { HTMLAttributes } from 'astro/types';
 import { iconPaths, type IconName } from '../lib/icons';
@@ -9,7 +10,7 @@ interface Props extends HTMLAttributes<'svg'> {
   size?: number;
 }
 
-const { name, size = 24, ...rest } = Astro.props;
+const { name, size = 24, class: className, ...rest } = Astro.props;
 ---
 
 <svg
@@ -19,12 +20,12 @@ const { name, size = 24, ...rest } = Astro.props;
   height={size}
   fill="none"
   stroke="currentColor"
-  stroke-width="1.75"
   stroke-linecap="round"
   stroke-linejoin="round"
   aria-hidden="true"
   focusable="false"
   {...rest}
+  class:list={['stroke-icon', className]}
   data-component="Icon"
   set:html={iconPaths[name]}
 />

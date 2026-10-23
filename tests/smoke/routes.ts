@@ -10,4 +10,4 @@ const slugs = (collection: string) =>
 
 export const newsRoutes = slugs('news').map((slug) => `/news/${slug}`);
 
-export const routes = ['/', '/styleguide', '/news', ...newsRoutes];
+export const routes = ['/', '/join', '/styleguide', '/news', ...newsRoutes];

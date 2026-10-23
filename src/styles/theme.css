@@ -8,7 +8,11 @@
  * висота рядка, радіуси, тіні, прозорість, ширини, точки переходу…), вимкнено (`initial`), тож існують
  * лише токени нижче. Утиліта з неіснуючим токеном (напр. `rounded-xl`, `font-light`) нічого не дає —
  * звіряйся з /styleguide, яка показує всі токени. Числа в обхід теми (`opacity-60`, `border-line/40`,
- * `border-2`) ловить лінт.
+ * `border-2`, `stroke-2`, `scale-105`, `brightness-90`) ловить лінт.
+ *
+ * Для товщини ліній SVG, трансформацій (scale, rotate, skew) і фільтрів (brightness, contrast…) у Tailwind
+ * немає токенів теми: потрібне значення оформлюється тут іменованою утилітою `@utility` поверх токена
+ * (як `stroke-icon` нижче) і показується на /styleguide.
  *
  * Редизайн = нові значення тут + правки компонентів. Сторінки не змінюються.
  */
@@ -101,6 +105,7 @@
   /* Товщина ліній: border — 1px (тонка, за замовчуванням), border-thick; підкреслення посилань */
   --border-width-thick: 2px; /* рамка кнопок, пунктир порожнього стану */
   --text-underline-offset-link: 2px; /* відступ підкреслення при наведенні: underline-offset-link */
+  --stroke-width-icon: 1.75; /* лінії іконок (компонент Icon): утиліта stroke-icon — нижче, після @theme */
 
   /* Ширини: max-w-page — контентна колонка, max-w-text — зручна ширина для читання тексту */
   --container-*: initial;
@@ -121,4 +126,9 @@
   --animate-*: initial;
   --perspective-*: initial;
   --aspect-*: initial;
+}
+
+/* Товщина ліній іконок. У Tailwind немає токенів для stroke-width, тож утиліта своя — поверх токена теми. */
+@utility stroke-icon {
+  stroke-width: var(--stroke-width-icon);
 }

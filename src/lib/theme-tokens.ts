@@ -14,7 +14,7 @@ export interface Token {
 
 // Групи з дефісом у назві — перед загальним `[a-z]+`, щоб `--font-weight-bold` не потрапив у шрифти.
 const TOKEN_LINE =
-  /^\s*--(font-weight|border-width|text-underline-offset|default-transition|[a-z]+)(?:-([a-z0-9-]+))?:\s*([^;]+);\s*(?:\/\*\s*(.*?)\s*\*\/)?/;
+  /^\s*--(font-weight|border-width|stroke-width|text-underline-offset|default-transition|[a-z]+)(?:-([a-z0-9-]+))?:\s*([^;]+);\s*(?:\/\*\s*(.*?)\s*\*\/)?/;
 
 export function parseTokens(css: string): Record<string, Token[]> {
   const groups: Record<string, Token[]> = {};

@@ -36,6 +36,26 @@ test('ловить числа в обхід теми: прозорість, ви
   assert.deepEqual(found('<p class="duration-300">'), ['duration-300']);
 });
 
+test('ловить товщину ліній SVG, трансформації й фільтри числами', () => {
+  assert.deepEqual(found('<svg class="stroke-2">'), ['stroke-2']);
+  assert.deepEqual(found('<svg stroke-width="1.75">'), ['stroke-width=']);
+  assert.deepEqual(found('<p class="hover:scale-105">'), ['scale-105']);
+  assert.deepEqual(found('<p class="scale-x-50">'), ['scale-x-50']);
+  assert.deepEqual(found('<p class="-rotate-45">'), ['-rotate-45']);
+  assert.deepEqual(found('<p class="skew-y-3">'), ['skew-y-3']);
+  assert.deepEqual(found('<img class="brightness-90">'), ['brightness-90']);
+  assert.deepEqual(found('<img class="group-hover:contrast-125">'), ['contrast-125']);
+  assert.deepEqual(found('<img class="grayscale-50">'), ['grayscale-50']);
+  assert.deepEqual(found('<div class="backdrop-saturate-150">'), ['backdrop-saturate-150']);
+  assert.deepEqual(found('<p class="hue-rotate-90">'), ['hue-rotate-90']);
+});
+
+test('пропускає іменовані утиліти, нульові й «без змін» трансформації та атрибути SVG', () => {
+  assert.deepEqual(found('<svg class="stroke-icon stroke-brand stroke-0" stroke-linecap="round">'), []);
+  assert.deepEqual(found('<p class="scale-100 hover:scale-100 rotate-0 brightness-100 grayscale">'), []);
+  assert.deepEqual(found('<p class="translate-x-4 -translate-y-1/2">'), []);
+});
+
 test('ловить довільне значення після «/»: прозорість і висоту рядка', () => {
   assert.deepEqual(found('<p class="bg-brand/[0.3]">'), ['bg-brand/[0.3]']);
   assert.deepEqual(found('<p class="text-sm/[1.3]">'), ['text-sm/[1.3]']);

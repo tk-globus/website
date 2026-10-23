@@ -14,4 +14,4 @@ export const mainNav: NavItem[] = [
   { label: 'Табір', href: null },
 ];
 
-export const joinLink: NavItem = { label: 'Долучитися', href: null };
+export const joinLink: NavItem = { label: 'Долучитися', href: '/join' };

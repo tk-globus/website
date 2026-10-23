@@ -17,6 +17,11 @@ const settingsSchema = z.object({
     forum: z.string().url(),
   }),
   address: z.string().min(1),
+  /** Куратори навчальних груп — імена показує сторінка /join. */
+  curators: z.object({
+    groupA: z.string().min(1),
+    groupB: z.string().min(1),
+  }),
   prototypeBanner: z.object({
     text: z.string().min(1),
     linkText: z.string().min(1),

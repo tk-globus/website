@@ -6,6 +6,7 @@ import Activities, { type Activity } from '../components/Activities.astro';
 import Breadcrumbs from '../components/Breadcrumbs.astro';
 import Button from '../components/Button.astro';
 import Card from '../components/Card.astro';
+import Channels from '../components/Channels.astro';
 import CardGrid from '../components/CardGrid.astro';
 import Cluster from '../components/Cluster.astro';
 import EmptyState from '../components/EmptyState.astro';
@@ -23,7 +24,7 @@ import Specimen from '../components/styleguide/Specimen.astro';
 import Toc from '../components/styleguide/Toc.astro';
 import TypeTokens from '../components/styleguide/TypeTokens.astro';
 import petros from '../assets/styleguide/petros.jpg';
-import korostyshiv from '../assets/styleguide/korostyshiv.jpg';
+import korostyshiv from '../assets/photos/korostyshiv-2026.jpg';
 
 const sections = [
   { id: 'colors', label: 'Кольори' },
@@ -34,6 +35,7 @@ const sections = [
   { id: 'tags', label: 'Мітки й іконки' },
   { id: 'cards', label: 'Картки' },
   { id: 'activities', label: 'Напрями' },
+  { id: 'channels', label: 'Канали' },
   { id: 'sections', label: 'Секції' },
   { id: 'hero', label: 'Герой' },
   { id: 'navigation', label: 'Навігація' },
@@ -41,7 +43,7 @@ const sections = [
   { id: 'prose', label: 'Текст' },
 ];
 
-// Приклади — для показу компонентів; справжні тексти напрямів зʼявляться на головній (тікет 04).
+// Приклади — для показу компонента; справжні тексти напрямів — на головній (src/pages/index.astro).
 const activities: Activity[] = [
   { icon: 'mountain', title: 'Походи', text: 'Від вихідних у Карпатах до категорійних маршрутів на Кавказі.' },
   { icon: 'book', title: 'Навчальні секції', text: 'Група А і Група Б: тренування, теорія, навчальні виїзди.' },
@@ -152,6 +154,12 @@ const activities: Activity[] = [
 
   <Section id="activities" tone="surface" title="Напрями діяльності" intro="Блок для головної: чим займається клуб.">
     <Activities items={activities} />
+  </Section>
+
+  <Section id="channels" title="Канали клубу" intro="Плитки-посилання на канали клубу; адреси — з налаштувань сайту.">
+    <Specimen title="Канали" usage={'<Channels />'}>
+      <Channels />
+    </Specimen>
   </Section>
 
   <Section id="sections" title="Секції" intro="Сторінка складається з секцій. Фон чергується, щоб розділити блоки.">

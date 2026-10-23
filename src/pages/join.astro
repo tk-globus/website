@@ -1,0 +1,78 @@
+---
+// /join — для новачків: як влаштоване навчання, кому підходить, і головна дія — Telegram-чат клубу.
+// Без форм, дат і телефонів. Імена кураторів і адреса чату — з налаштувань сайту (src/data/settings.json).
+// Текст — за оголошенням про набір на старому сайті (https://www.tkg.org.ua/node/36724), оновлений.
+import BaseLayout from '../layouts/BaseLayout.astro';
+import Activities, { type Activity } from '../components/Activities.astro';
+import Button from '../components/Button.astro';
+import Hero from '../components/Hero.astro';
+import Prose from '../components/Prose.astro';
+import Section from '../components/Section.astro';
+import { settings } from '../lib/settings';
+import heroPhoto from '../assets/photos/group-a-training-2026.jpg';
+
+const { curators, channels } = settings;
+
+const training: Activity[] = [
+  {
+    icon: 'users',
+    title: 'Група А',
+    text: `Для початківців і тих, хто хоче систематизувати знання: лекції з основ туризму, підготовка до перших походів. Тут же працює школа інструкторів табору «Глобус». Куратор — ${curators.groupA}.`,
+  },
+  {
+    icon: 'mountain',
+    title: 'Група Б',
+    text: `Для досвідчених туристів, які збираються учасниками в походи 3–6 к.с. Куратор — ${curators.groupB}.`,
+  },
+  {
+    icon: 'compass',
+    title: 'Тренування',
+    text: 'Технічні тренування й практичні заняття — зазвичай на вихідних. Тут теорія з лекцій стає навичками.',
+  },
+  {
+    icon: 'tent',
+    title: 'Виїзди',
+    text: 'Загальноклубні виїзди, походи вихідного дня і змагання — щоб перевірити себе перед справжнім походом.',
+  },
+];
+---
+
+<BaseLayout
+  title="Як долучитися"
+  description="Як почати ходити в походи з турклубом «Глобус»: навчання в Групі А і Групі Б, тренування й виїзди. Напишіть у Telegram-чат клубу."
+>
+  <Hero
+    image={heroPhoto}
+    alt="Новачки Групи А на першому тренуванні слухають інструкторку"
+    title="Як долучитися до «Глобуса»"
+    lead="Навчимо ходити в походи з нуля. Почніть із Telegram-чату клубу: там анонси занять і відповіді на ваші питання."
+  >
+    <Button href={channels.telegram} size="lg" icon="send">Написати в Telegram-чат</Button>
+  </Hero>
+
+  <Section
+    title="Як влаштоване навчання"
+    intro="Заняття в клубі відкриті й безкоштовні. Лекції — за розкладом по четвергах; розклад і анонси — у Telegram-чаті."
+  >
+    <Activities items={training} />
+  </Section>
+
+  <Section tone="surface" title="Кому підходить">
+    <Prose>
+      <ul>
+        <li>Ви ніколи не були в поході, але дуже хочеться, — починайте з Групи А.</li>
+        <li>Ходили з друзями й хочете ходити безпечніше, складніше і з розумінням, що робите.</li>
+        <li>Маєте досвід категорійних походів і шукаєте команду на 3–6 к.с. — вам у Групу Б.</li>
+        <li>Вік і «вузівська приналежність» не важливі: клуб живе при КПІ, але відкритий для всіх.</li>
+      </ul>
+    </Prose>
+  </Section>
+
+  <Section
+    tone="brand"
+    title="Напишіть нам у Telegram"
+    intro="У чаті клубу — анонси лекцій, тренувань і виїздів. Поставте будь-яке питання: відповідають учасники й куратори."
+  >
+    <Button href={channels.telegram} variant="secondary" size="lg" icon="send">Відкрити Telegram-чат</Button>
+  </Section>
+</BaseLayout>
