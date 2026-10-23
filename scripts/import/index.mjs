@@ -7,6 +7,7 @@
 //   npm run import -- news --limit 3        лише перші 3 записи
 //   npm run import -- news --refresh        завантажити сторінки заново, а не з кешу
 //   npm run import -- reports               звіти: вибірка з аудиту; --scope all — уся бібліотека (/trip_search)
+//   npm run import -- pages                 статичні сторінки: «Про клуб», «МКК», «Табір» (about.md, mkk.md, camp.md)
 //
 // Кеш сторінок і фото — .cache/old-site/ (у .gitignore). Між запитами в мережу — пауза 1,5–2 с.
 import { parseArgs } from 'node:util';

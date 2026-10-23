@@ -13,3 +13,6 @@ export const newsRoutes = slugs('news').map((slug) => `/news/${slug}`);
 export const reportRoutes = slugs('reports').map((slug) => `/library/${slug}`);
 
 export const routes = ['/', '/join', '/styleguide', '/news', ...newsRoutes, '/library', ...reportRoutes];
+
+// Статичні сторінки (тікет 09).
+routes.push('/about', '/mkk', '/camp');

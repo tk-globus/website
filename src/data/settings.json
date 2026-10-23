@@ -11,7 +11,33 @@
     "oldSite": "https://www.tkg.org.ua",
     "forum": "https://www.tkg.org.ua/forum"
   },
+  "channelTexts": {
+    "telegram": {
+      "label": "Telegram-чат",
+      "note": "Анонси, питання й живе спілкування"
+    },
+    "instagram": {
+      "label": "Instagram",
+      "note": "Фото й відео з походів"
+    },
+    "youtube": {
+      "label": "YouTube",
+      "note": "Відео клубу"
+    },
+    "facebook": {
+      "label": "Facebook",
+      "note": "Новини й анонси"
+    },
+    "email": {
+      "note": "Пошта клубу"
+    }
+  },
   "address": "Київ, вул. Верхньоключова, 1/26, спортивний (24-й) корпус КПІ",
+  "mkk": {
+    "email": "mkk_tkg@googlegroups.com",
+    "schedule": "https://www.tkg.org.ua/node/4765",
+    "members": "https://www.tkg.org.ua/node/4764"
+  },
   "curators": {
     "groupA": "Роман Берегун",
     "groupB": "Тетяна Моянська"

@@ -3,6 +3,11 @@
 import { z } from 'astro/zod';
 import raw from '../data/settings.json';
 
+const channelText = z.object({
+  label: z.string().min(1).optional(),
+  note: z.string().min(1),
+});
+
 const settingsSchema = z.object({
   name: z.string().min(1),
   shortName: z.string().min(1),
@@ -16,7 +21,24 @@ const settingsSchema = z.object({
     oldSite: z.string().url(),
     forum: z.string().url(),
   }),
+  /**
+   * Підписи каналів і що там є (підвал, блок «Канали клубу»). Без `label` показується сама адреса (пошта).
+   * Адреси — у `channels`, іконки — у src/lib/channels.ts.
+   */
+  channelTexts: z.object({
+    telegram: channelText,
+    instagram: channelText,
+    youtube: channelText,
+    facebook: channelText,
+    email: channelText,
+  }),
   address: z.string().min(1),
+  /** Контакт МКК для сторінки /mkk: загальна пошта, графік засідань і склад комісії (на старому сайті). */
+  mkk: z.object({
+    email: z.string().email(),
+    schedule: z.string().url(),
+    members: z.string().url(),
+  }),
   /** Куратори навчальних груп — імена показує сторінка /join. */
   curators: z.object({
     groupA: z.string().min(1),
