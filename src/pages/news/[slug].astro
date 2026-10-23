@@ -1,0 +1,42 @@
+---
+// Окрема новина: заголовок, дата, обкладинка й текст. Посилання на оригінал — щоб звірити з tkg.org.ua.
+import { Image } from 'astro:assets';
+import { render } from 'astro:content';
+import BaseLayout from '../../layouts/BaseLayout.astro';
+import PageHeader from '../../components/PageHeader.astro';
+import Section from '../../components/Section.astro';
+import Prose from '../../components/Prose.astro';
+import { getNews, type News } from '../../lib/news';
+import { formatDate, isoDate } from '../../lib/dates';
+
+export async function getStaticPaths() {
+  const news = await getNews();
+  return news.map((entry) => ({ params: { slug: entry.id }, props: { entry } }));
+}
+
+const { entry } = Astro.props as { entry: News };
+const { title, date, cover, coverAlt, description, legacyUrl } = entry.data;
+const { Content } = await render(entry);
+---
+
+<BaseLayout title={title} description={description}>
+  <PageHeader title={title} breadcrumbs={[{ label: 'Новини', href: '/news' }, { label: title }]}>
+    <time datetime={isoDate(date)}>{formatDate(date)}</time>
+  </PageHeader>
+  <Section>
+    <Prose>
+      {
+        cover && (
+          <Image
+            src={cover}
+            alt={coverAlt ?? ''}
+            widths={[...new Set([400, 800, 1200].map((w) => Math.min(w, cover.width)))]}
+            sizes="(min-width: 48rem) 42rem, 100vw"
+          />
+        )
+      }
+      <Content />
+      <p><a href={legacyUrl}>Оригінал на старому сайті</a></p>
+    </Prose>
+  </Section>
+</BaseLayout>
