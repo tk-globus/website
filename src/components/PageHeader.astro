@@ -1,0 +1,29 @@
+---
+// Шапка звичайної сторінки (без фото): хлібні крихти, заголовок h1, вступ.
+// Слот — під вступом (зміст сторінки, фільтри). Сторінкам із великим фото — компонент Hero.
+import Breadcrumbs, { type Crumb } from './Breadcrumbs.astro';
+import Container from './Container.astro';
+
+interface Props {
+  title: string;
+  lead?: string;
+  breadcrumbs?: Crumb[];
+}
+
+const { title, lead, breadcrumbs } = Astro.props;
+---
+
+<div class="border-b border-line/40 bg-surface">
+  <Container class="py-10 md:py-14">
+    {breadcrumbs && <Breadcrumbs items={breadcrumbs} />}
+    <h1 class:list={['text-3xl font-bold text-brand md:text-4xl', breadcrumbs && 'mt-4']}>{title}</h1>
+    {lead && <p class="mt-4 max-w-text text-lg text-muted">{lead}</p>}
+    {
+      Astro.slots.has('default') && (
+        <div class="mt-8">
+          <slot />
+        </div>
+      )
+    }
+  </Container>
+</div>

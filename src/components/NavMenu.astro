@@ -1,0 +1,46 @@
+---
+// Пункти головного меню (з src/lib/nav.ts): у рядок (компʼютер) або стовпчиком (телефон).
+// Пункт без адреси — сторінки ще немає — показується сірим текстом без посилання.
+import { mainNav } from '../lib/nav';
+
+interface Props {
+  layout: 'row' | 'column';
+}
+
+const { layout } = Astro.props;
+const current = Astro.url.pathname;
+const isCurrent = (href: string) => current === href || current.startsWith(`${href}/`);
+---
+
+<ul
+  class:list={[
+    layout === 'row' ? 'flex items-center gap-x-1 text-sm' : 'flex flex-col text-base',
+  ]}
+>
+  {
+    mainNav.map((item) => (
+      <li>
+        {item.href ? (
+          <a
+            class:list={[
+              'block rounded-md font-semibold hover:bg-brand-soft hover:text-brand-dark',
+              layout === 'row' ? 'px-3 py-2' : 'px-2 py-3',
+              isCurrent(item.href) ? 'text-brand' : 'text-ink',
+            ]}
+            href={item.href}
+            aria-current={isCurrent(item.href) ? 'page' : undefined}
+          >
+            {item.label}
+          </a>
+        ) : (
+          <span
+            class:list={['block font-semibold text-muted', layout === 'row' ? 'px-3 py-2' : 'px-2 py-3']}
+            title="Сторінка в розробці"
+          >
+            {item.label}
+          </span>
+        )}
+      </li>
+    ))
+  }
+</ul>

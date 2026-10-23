@@ -1,0 +1,42 @@
+---
+// Секція сторінки: смуга на всю ширину з контентною колонкою, необовʼязковим заголовком і вступом.
+// tone: paper — білий фон, surface — світлий бірюзовий (для чергування), brand — бірюзовий з білим текстом.
+// Слот `action` — посилання праворуч від заголовка («Усі новини →»).
+import Container from './Container.astro';
+
+interface Props {
+  title?: string;
+  intro?: string;
+  tone?: 'paper' | 'surface' | 'brand';
+  id?: string;
+}
+
+const { title, intro, tone = 'paper', id } = Astro.props;
+const hasAction = Astro.slots.has('action');
+---
+
+<section
+  id={id}
+  class:list={[
+    { paper: 'bg-paper', surface: 'bg-surface', brand: 'bg-brand text-on-brand' }[tone],
+  ]}
+>
+  <Container class="py-12 md:py-16">
+    {
+      (title || hasAction) && (
+        <header class="mb-8 flex flex-wrap items-end justify-between gap-4">
+          <div>
+            {title && <h2 class="text-2xl font-bold md:text-3xl">{title}</h2>}
+            {intro && (
+              <p class:list={['mt-2 max-w-text text-lg', tone === 'brand' ? 'text-on-brand/85' : 'text-muted']}>
+                {intro}
+              </p>
+            )}
+          </div>
+          {hasAction && <slot name="action" />}
+        </header>
+      )
+    }
+    <slot />
+  </Container>
+</section>

@@ -1,41 +1,71 @@
 ---
 // Шапка: логотип, меню, кнопка «Долучитися». Пункти — у src/lib/nav.ts.
-// Тікет 03 переведе на компоненти бібліотеки і додасть згортання меню на телефоні.
+// На компʼютері (від lg) меню в рядок; на телефоні й планшеті — згорнуте під кнопку «Меню».
 import logo from '../assets/logo.svg';
 import { settings } from '../lib/settings';
-import { mainNav, joinLink } from '../lib/nav';
+import { joinLink } from '../lib/nav';
+import Button from './Button.astro';
+import Container from './Container.astro';
+import Icon from './Icon.astro';
+import NavMenu from './NavMenu.astro';
 ---
 
-<header class="border-b border-line">
-  <div class="mx-auto flex max-w-page flex-wrap items-center justify-between gap-4 px-4 py-3">
-    <a href="/" class="block">
-      <img src={logo.src} alt={settings.name} width={logo.width} height={logo.height} class="h-10 w-auto" />
+<header class="sticky top-0 z-30 border-b border-line/40 bg-paper">
+  <Container class="flex items-center justify-between gap-4 py-3">
+    <a href="/" class="shrink-0">
+      <img src={logo.src} alt={settings.name} width={logo.width} height={logo.height} class="h-9 w-auto lg:h-10" />
     </a>
-    <nav aria-label="Головне меню">
-      <ul class="flex flex-wrap items-center gap-x-4 gap-y-1 text-sm">
-        {
-          mainNav.map((item) => (
-            <li>
-              {item.href ? (
-                <a class="hover:text-brand" href={item.href}>{item.label}</a>
-              ) : (
-                <span class="text-muted" title="Сторінка в розробці">{item.label}</span>
-              )}
-            </li>
-          ))
-        }
-      </ul>
+    <nav aria-label="Головне меню" class="hidden lg:block">
+      <NavMenu layout="row" />
     </nav>
-    {
-      joinLink.href ? (
-        <a class="rounded bg-brand px-4 py-2 text-sm font-semibold text-on-brand" href={joinLink.href}>
-          {joinLink.label}
-        </a>
-      ) : (
-        <span class="rounded bg-brand px-4 py-2 text-sm font-semibold text-on-brand opacity-60" title="Сторінка в розробці">
-          {joinLink.label}
-        </span>
-      )
-    }
+    <div class="hidden lg:block">
+      <Button href={joinLink.href}>{joinLink.label}</Button>
+    </div>
+    <button
+      type="button"
+      class="inline-flex items-center gap-2 rounded-md border border-line px-3 py-2 text-sm font-semibold hover:bg-brand-soft lg:hidden"
+      aria-expanded="false"
+      aria-controls="mobile-menu"
+      data-menu-toggle
+    >
+      <Icon name="menu" size={20} data-menu-icon="open" />
+      <Icon name="close" size={20} data-menu-icon="close" class="hidden" />
+      <span data-menu-label>Меню</span>
+    </button>
+  </Container>
+  <div id="mobile-menu" class="border-t border-line/40 bg-paper shadow-lg lg:hidden" hidden>
+    <Container class="py-4">
+      <nav aria-label="Головне меню">
+        <NavMenu layout="column" />
+      </nav>
+      <div class="mt-4">
+        <Button href={joinLink.href} size="lg" full>{joinLink.label}</Button>
+      </div>
+    </Container>
   </div>
 </header>
+
+<script>
+  // Згортання меню на телефоні: кнопка відкриває/закриває, Escape закриває.
+  const toggle = document.querySelector<HTMLButtonElement>('[data-menu-toggle]');
+  const menu = document.getElementById('mobile-menu');
+
+  if (toggle && menu) {
+    const setOpen = (open: boolean) => {
+      menu.hidden = !open;
+      toggle.setAttribute('aria-expanded', String(open));
+      toggle.querySelector('[data-menu-icon="open"]')?.classList.toggle('hidden', open);
+      toggle.querySelector('[data-menu-icon="close"]')?.classList.toggle('hidden', !open);
+      const label = toggle.querySelector('[data-menu-label]');
+      if (label) label.textContent = open ? 'Закрити' : 'Меню';
+    };
+
+    toggle.addEventListener('click', () => setOpen(menu.hidden));
+    document.addEventListener('keydown', (event) => {
+      if (event.key === 'Escape' && !menu.hidden) {
+        setOpen(false);
+        toggle.focus();
+      }
+    });
+  }
+</script>

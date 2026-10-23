@@ -1,11 +1,17 @@
 ---
 // Тимчасова головна; повноцінну візитівку робить тікет 04.
 import BaseLayout from '../layouts/BaseLayout.astro';
+import PageHeader from '../components/PageHeader.astro';
+import Section from '../components/Section.astro';
+import Prose from '../components/Prose.astro';
 import { settings } from '../lib/settings';
 ---
 
 <BaseLayout>
-  <h1 class="text-3xl font-bold text-brand">{settings.name}</h1>
-  <p class="mt-4 max-w-2xl text-muted">{settings.description}</p>
-  <p class="mt-4 text-muted">Сайт у розробці.</p>
+  <PageHeader title={settings.name} lead={settings.description} />
+  <Section>
+    <Prose>
+      <p>Сайт у розробці.</p>
+    </Prose>
+  </Section>
 </BaseLayout>

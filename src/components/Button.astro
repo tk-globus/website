@@ -1,0 +1,55 @@
+---
+// Кнопка: основна (primary) — головна дія, вторинна (secondary) — додаткова.
+// href — посилання; href: null — сторінки ще немає (неактивна кнопка); без href — <button>.
+import Icon from './Icon.astro';
+import type { IconName } from '../lib/icons';
+
+interface Props {
+  href?: string | null;
+  variant?: 'primary' | 'secondary';
+  size?: 'md' | 'lg';
+  /** На всю ширину контейнера (напр. у мобільному меню). */
+  full?: boolean;
+  icon?: IconName;
+  type?: 'button' | 'submit';
+}
+
+const { href, variant = 'primary', size = 'md', full = false, icon, type = 'button' } = Astro.props;
+
+const disabled = href === null;
+
+const classes = [
+  'inline-flex items-center justify-center gap-2 rounded-md border-2 font-semibold transition-colors',
+  {
+    primary: 'border-brand bg-brand text-on-brand',
+    secondary: 'border-brand bg-paper text-brand',
+  }[variant],
+  !disabled &&
+    {
+      primary: 'hover:border-brand-dark hover:bg-brand-dark',
+      secondary: 'hover:bg-brand-soft',
+    }[variant],
+  { md: 'px-4 py-2 text-sm', lg: 'px-6 py-3 text-base' }[size],
+  full && 'w-full',
+  disabled && 'cursor-not-allowed opacity-60',
+];
+---
+
+{
+  disabled ? (
+    <span class:list={classes} aria-disabled="true" title="Сторінка в розробці">
+      <slot />
+      {icon && <Icon name={icon} size={18} />}
+    </span>
+  ) : href ? (
+    <a class:list={classes} href={href}>
+      <slot />
+      {icon && <Icon name={icon} size={18} />}
+    </a>
+  ) : (
+    <button class:list={classes} type={type}>
+      <slot />
+      {icon && <Icon name={icon} size={18} />}
+    </button>
+  )
+}

@@ -1,0 +1,21 @@
+---
+// Мітка: район, вид туризму, к.с., «майбутня» подія тощо.
+interface Props {
+  tone?: 'brand' | 'accent' | 'neutral';
+}
+
+const { tone = 'brand' } = Astro.props;
+---
+
+<span
+  class:list={[
+    'inline-flex items-center rounded-sm px-2 py-0.5 text-xs font-semibold',
+    {
+      brand: 'bg-brand-soft text-brand-dark',
+      accent: 'bg-accent text-ink',
+      neutral: 'border border-line text-muted',
+    }[tone],
+  ]}
+>
+  <slot />
+</span>

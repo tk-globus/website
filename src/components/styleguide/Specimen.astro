@@ -1,0 +1,19 @@
+---
+// Зразок на /styleguide: назва, як викликати компонент, і сам приклад у рамці.
+interface Props {
+  title: string;
+  usage?: string;
+  /** Приклад на всю ширину без внутрішніх відступів (герой, секції). */
+  bleed?: boolean;
+}
+
+const { title, usage, bleed = false } = Astro.props;
+---
+
+<div class="mt-10 first:mt-0" data-testid="specimen">
+  <h3 class="text-lg font-bold">{title}</h3>
+  {usage && <code class="mt-1 block overflow-x-auto text-sm text-muted">{usage}</code>}
+  <div class:list={['mt-3 overflow-hidden rounded-lg border border-line/60', !bleed && 'bg-paper p-6']}>
+    <slot />
+  </div>
+</div>

@@ -1,31 +1,75 @@
 /*
  * Тема «освіжений Глобус» — ЄДИНЕ місце, де задаються дизайн-значення (ADR 0003).
  * Компоненти й сторінки використовують лише утиліти Tailwind, згенеровані з цих токенів
- * (bg-brand, text-ink, p-4, font-sans…). Зашиті значення поза src/styles/ ловить `npm run lint:tokens`.
+ * (bg-brand, text-ink, p-4, rounded-md, shadow-sm, font-sans…). Зашиті значення поза src/styles/
+ * ловить `npm run lint:tokens`.
  *
- * Стандартну палітру й шрифти Tailwind вимкнено (`initial`), тож існують лише токени нижче.
- * Тікет 03 розширить тему: типографічна шкала, радіуси, тіні.
+ * Стандартні кольори, шрифти, розміри тексту, радіуси, тіні й ширини Tailwind вимкнено (`initial`),
+ * тож існують лише токени нижче. Утиліта з неіснуючим токеном (напр. `rounded-xl`) нічого не дає —
+ * звіряйся з /styleguide, яка показує всі токени.
+ *
+ * Редизайн = нові значення тут + правки компонентів. Сторінки не змінюються.
  */
 @theme {
   /* Кольори — з логотипа «Глобуса» */
   --color-*: initial;
-  --color-brand: #16666c; /* темно-бірюзовий, основний */
-  --color-brand-blue: #2bace2; /* блакитний */
-  --color-brand-cyan: #40c3da; /* бірюзово-блакитний */
-  --color-accent: #fcee23; /* жовтий */
+  --color-brand: #16666c; /* темно-бірюзовий, основний: кнопки, посилання, акценти */
+  --color-brand-dark: #0f4d52; /* темніший бірюзовий: наведення на кнопки й посилання */
+  --color-brand-blue: #2bace2; /* блакитний: рамка фокусу, декор */
+  --color-brand-cyan: #40c3da; /* бірюзово-блакитний: декор, іконки на темному */
+  --color-brand-soft: #dff0f1; /* світлий бірюзовий: мітки, фон іконок */
+  --color-accent: #fcee23; /* жовтий: банер прототипу, найважливіші позначки */
   --color-ink: #010101; /* основний текст */
-  --color-muted: #595a5c; /* другорядний текст */
+  --color-muted: #595a5c; /* другорядний текст: дати, підписи */
   --color-line: #a8aaad; /* лінії, рамки */
-  --color-paper: #ffffff; /* фон */
-  --color-on-brand: #ffffff; /* текст на кольоровому фоні */
+  --color-paper: #ffffff; /* фон сторінки й карток */
+  --color-surface: #f2f8f8; /* фон секцій, що чергуються з основним */
+  --color-on-brand: #ffffff; /* текст на кольоровому фоні й на фото */
 
-  /* Шрифт — системний, з кирилицею; остаточну типографіку обирає тікет 03 */
+  /* Шрифт — Manrope (кирилиця з ґ, є, і, ї), геометричний, як лінії логотипа. Файли — з пакета
+     @fontsource-variable/manrope, підключені в global.css; далі — системні шрифти про запас. */
   --font-*: initial;
-  --font-sans: system-ui, -apple-system, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+  --font-sans: "Manrope Variable", system-ui, -apple-system, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
 
-  /* Відступи: крок шкали; p-4 = 4 × крок */
+  /* Розміри тексту з висотою рядка: text-sm, text-base… */
+  --text-*: initial;
+  --text-xs: 0.75rem;
+  --text-xs--line-height: 1.5;
+  --text-sm: 0.875rem;
+  --text-sm--line-height: 1.5;
+  --text-base: 1rem;
+  --text-base--line-height: 1.65;
+  --text-lg: 1.125rem;
+  --text-lg--line-height: 1.6;
+  --text-xl: 1.25rem;
+  --text-xl--line-height: 1.45;
+  --text-2xl: 1.5rem;
+  --text-2xl--line-height: 1.3;
+  --text-3xl: 2rem;
+  --text-3xl--line-height: 1.2;
+  --text-4xl: 2.5rem;
+  --text-4xl--line-height: 1.15;
+  --text-5xl: 3.25rem;
+  --text-5xl--line-height: 1.1;
+
+  /* Відступи: один крок шкали; p-4 = 4 × крок = 1rem. Уживані кроки: 1 2 3 4 6 8 12 16 24 */
   --spacing: 0.25rem;
 
-  /* Ширина контентної колонки: max-w-page */
+  /* Радіуси: rounded-sm (мітки), rounded-md (кнопки, поля), rounded-lg (картки, фото), rounded-full */
+  --radius-*: initial;
+  --radius-sm: 0.25rem;
+  --radius-md: 0.5rem;
+  --radius-lg: 1rem;
+  --radius-full: 9999px;
+
+  /* Тіні — легкі, з бірюзовим відтінком: shadow-sm (картка), shadow-md (наведення), shadow-lg (меню) */
+  --shadow-*: initial;
+  --shadow-sm: 0 1px 2px rgb(1 1 1 / 0.06), 0 2px 8px rgb(22 102 108 / 0.08);
+  --shadow-md: 0 2px 4px rgb(1 1 1 / 0.06), 0 8px 24px rgb(22 102 108 / 0.16);
+  --shadow-lg: 0 4px 8px rgb(1 1 1 / 0.08), 0 16px 40px rgb(22 102 108 / 0.2);
+
+  /* Ширини: max-w-page — контентна колонка, max-w-text — зручна ширина для читання тексту */
+  --container-*: initial;
   --container-page: 72rem;
+  --container-text: 42rem;
 }

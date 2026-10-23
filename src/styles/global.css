@@ -1,10 +1,19 @@
 @import "tailwindcss";
+@import "@fontsource-variable/manrope";
 @import "./theme.css";
+@import "./prose.css";
 
 @layer base {
   html {
     font-family: var(--font-sans);
     color: var(--color-ink);
     background-color: var(--color-paper);
+    -webkit-text-size-adjust: 100%;
+  }
+
+  /* Видима рамка фокусу для клавіатури — на всіх інтерактивних елементах */
+  :focus-visible {
+    outline: 2px solid var(--color-brand-blue);
+    outline-offset: 2px;
   }
 }
