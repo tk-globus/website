@@ -6,12 +6,12 @@ export interface NavItem {
 }
 
 export const mainNav: NavItem[] = [
-  { label: 'Про клуб', href: null },
+  { label: 'Про клуб', href: '/about' },
   { label: 'Новини', href: '/news' },
   { label: 'Події', href: null },
   { label: 'Бібліотека', href: '/library' },
-  { label: 'МКК', href: null },
-  { label: 'Табір', href: null },
+  { label: 'МКК', href: '/mkk' },
+  { label: 'Табір', href: '/camp' },
 ];
 
 export const joinLink: NavItem = { label: 'Долучитися', href: '/join' };

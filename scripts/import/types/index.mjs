@@ -9,7 +9,9 @@
 //   sampleUrls()  — адреси вибірки для прототипу (--scope sample)
 //   listSources   — сторінки-списки старого сайту для --scope all
 //   parseList(html) → { urls, next } — адреси записів зі сторінки списку і наступна сторінка (або null)
+//   noCover       — (необовʼязково) true: у типу немає обкладинки — не попереджати про її відсутність
 //   parse(html, url) → { legacyUrl, title, data, cover, bodyHtml }
+//       slug      — (необовʼязково) імʼя файлу замість slug із заголовка (сторінки: about, mkk, camp)
 //       data      — поля frontmatter (без обкладинки), мають пройти схему колекції
 //       cover     — { src, alt } оригіналу на старому сайті або null
 //       bodyHtml  — HTML тіла з абсолютними адресами (ядро завантажить фото й перетворить на Markdown)
@@ -17,5 +19,6 @@
 //       warnings  — (необовʼязково) інші попередження про запис
 import news from './news.mjs';
 import reports from './reports.mjs';
+import pages from './pages.mjs';
 
-export const types = { news, reports };
+export const types = { news, reports, pages };

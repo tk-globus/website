@@ -1,0 +1,23 @@
+---
+// /camp — табір «Глобус» у Карпатах і школа інструкторів. Текст — зі старого сайту (src/content/pages/camp.md).
+import { render } from 'astro:content';
+import BaseLayout from '../layouts/BaseLayout.astro';
+import PageHeader from '../components/PageHeader.astro';
+import Prose from '../components/Prose.astro';
+import Section from '../components/Section.astro';
+import { getPage } from '../lib/pages';
+
+const page = await getPage('camp');
+const { title, description, legacyUrl } = page.data;
+const { Content } = await render(page);
+---
+
+<BaseLayout title={title} description={description}>
+  <PageHeader title={title} breadcrumbs={[{ label: 'Табір' }]} />
+  <Section>
+    <Prose>
+      <Content />
+      <p><a href={legacyUrl}>Оригінал на старому сайті</a></p>
+    </Prose>
+  </Section>
+</BaseLayout>

@@ -35,8 +35,16 @@ export function indexExisting(contentDir) {
   return { byLegacy, slugs, warnings };
 }
 
-/** Slug запису: той самий для того самого legacy URL; новий — із заголовка, при збігу — з номером вузла. */
-export function chooseSlug({ legacyUrl, title }, index) {
+/**
+ * Slug запису: той самий для того самого legacy URL; новий — із заголовка, при збігу — з номером вузла.
+ * Парсер може задати slug сам (`slug` — напр. сторінка «Про клуб» завжди about.md, бо це її адреса на сайті).
+ */
+export function chooseSlug({ legacyUrl, title, slug: fixed }, index) {
+  if (fixed) {
+    index.byLegacy.set(legacyUrl, fixed);
+    index.slugs.add(fixed);
+    return fixed;
+  }
   const known = index.byLegacy.get(legacyUrl);
   if (known) return known;
   const nid = nodeId(legacyUrl);
@@ -117,7 +125,7 @@ export async function importItem(type, url, { root, fetcher, index }) {
   }
 
   const cover = parsed.cover ? await localImage(parsed.cover.src) : null;
-  if (!parsed.cover) warnings.push('без обкладинки (у тексті немає фото)');
+  if (!parsed.cover && !type.noCover) warnings.push('без обкладинки (у тексті немає фото)');
 
   // Завантажуємо лише фото, що стануть Markdown-картинками. Фото всередині сирого HTML (таблиці з
   // обʼєднаними клітинками) лишаються посиланням на старий сайт: збірка відносних шляхів у HTML не бачить.
@@ -170,6 +178,8 @@ export function summarizeUnrecognized(results) {
 export async function collectUrls(type, { scope, fetcher, log = () => {} }) {
   if (scope === 'sample') return type.sampleUrls();
   if (scope !== 'all') throw new Error(`невідомий обсяг «${scope}»: sample або all`);
+  // Тип без сторінок-списків на старому сайті (статичні сторінки): «усе» — та сама вибірка.
+  if (!type.listSources) return type.sampleUrls();
   const urls = [];
   for (const source of type.listSources) {
     for (let page = source, seen = new Set(); page && !seen.has(page); ) {

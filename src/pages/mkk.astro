@@ -1,0 +1,40 @@
+---
+// /mkk — маршрутно-кваліфікаційна комісія: що це, як випуститися й захистити похід, FAQ і документи
+// (посилання на старий сайт). Текст — зі старого сайту (src/content/pages/mkk.md).
+// Контакт МКК (пошта, графік, склад) — з налаштувань сайту.
+import { render } from 'astro:content';
+import BaseLayout from '../layouts/BaseLayout.astro';
+import Button from '../components/Button.astro';
+import Cluster from '../components/Cluster.astro';
+import PageHeader from '../components/PageHeader.astro';
+import Prose from '../components/Prose.astro';
+import Section from '../components/Section.astro';
+import { getPage } from '../lib/pages';
+import { settings } from '../lib/settings';
+
+const page = await getPage('mkk');
+const { title, description, legacyUrl } = page.data;
+const { Content } = await render(page);
+const { mkk } = settings;
+---
+
+<BaseLayout title={title} description={description}>
+  <PageHeader title={title} breadcrumbs={[{ label: 'МКК' }]} />
+  <Section
+    tone="surface"
+    title="Контакт МКК"
+    intro="Запишіться на засідання за графіком роботи МКК і заздалегідь надішліть на пошту комісії район, нитку маршруту, дати й склад групи."
+  >
+    <Cluster>
+      <Button href={`mailto:${mkk.email}`} icon="mail">{mkk.email}</Button>
+      <Button href={mkk.schedule} variant="secondary" icon="calendar">Графік роботи МКК</Button>
+      <Button href={mkk.members} variant="secondary" icon="users">Склад МКК і координати</Button>
+    </Cluster>
+  </Section>
+  <Section>
+    <Prose>
+      <Content />
+      <p><a href={legacyUrl}>Оригінал на старому сайті</a></p>
+    </Prose>
+  </Section>
+</BaseLayout>
