@@ -1,19 +1,27 @@
 ---
-// Базовий макет: кожна сторінка обгортається ним. Тут — noindex, банер прототипу, шапка й підвал.
+// Базовий макет: кожна сторінка обгортається ним. Тут — noindex, банер прототипу, шапка й підвал,
+// а також превʼю посилання в месенджерах і соцмережах (Open Graph і Twitter-картка).
 // Вміст сторінки складається з секцій-компонентів (Section, Hero, PageHeader…), кожна сама тримає колонку.
 import '../styles/global.css';
 import PrototypeBanner from '../components/PrototypeBanner.astro';
 import SiteHeader from '../components/SiteHeader.astro';
 import SiteFooter from '../components/SiteFooter.astro';
 import { settings } from '../lib/settings';
+import { OG_IMAGE } from '../lib/og-image';
 
 interface Props {
   title?: string;
   description?: string;
+  /** Картинка превʼю: адреса на сайті (1200×630). За замовчуванням — картка з логотипом /og.png. */
+  image?: string;
+  imageAlt?: string;
 }
 
-const { title, description = settings.description } = Astro.props;
+const { title, description = settings.description, image = OG_IMAGE.path, imageAlt = OG_IMAGE.alt } = Astro.props;
 const fullTitle = title ? `${title} — ${settings.shortName}` : settings.name;
+// Месенджери беруть превʼю лише за повною адресою; адреса сайту — `site` в astro.config.mjs.
+const pageUrl = new URL(Astro.url.pathname, Astro.site).href;
+const imageUrl = new URL(image, Astro.site).href;
 ---
 
 <!doctype html>
@@ -24,6 +32,19 @@ const fullTitle = title ? `${title} — ${settings.shortName}` : settings.name;
     <meta name="robots" content="noindex, nofollow" />
     <title>{fullTitle}</title>
     <meta name="description" content={description} />
+    <meta property="og:type" content="website" />
+    <meta property="og:site_name" content={settings.name} />
+    <meta property="og:locale" content="uk_UA" />
+    <meta property="og:title" content={fullTitle} />
+    <meta property="og:description" content={description} />
+    <meta property="og:url" content={pageUrl} />
+    <meta property="og:image" content={imageUrl} />
+    <meta property="og:image:alt" content={imageAlt} />
+    <meta name="twitter:card" content="summary_large_image" />
+    <meta name="twitter:title" content={fullTitle} />
+    <meta name="twitter:description" content={description} />
+    <meta name="twitter:image" content={imageUrl} />
+    <meta name="twitter:image:alt" content={imageAlt} />
     <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
   </head>
   <body class="flex min-h-screen flex-col">

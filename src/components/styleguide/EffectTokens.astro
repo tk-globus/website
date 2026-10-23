@@ -1,6 +1,7 @@
 ---
 // Прозорість, товщина ліній, точки переходу й рух — з theme.css. Іде на /styleguide після ShapeTokens.
 import { tokens, utilityFor } from '../../lib/theme-tokens';
+import Icon from '../Icon.astro';
 
 const opacityClass: Record<string, string> = {
   soft: 'bg-ink/soft',
@@ -69,6 +70,19 @@ const underlineClass: Record<string, string> = {
         </span>
         <code class="text-sm text-muted">
           underline-offset-{t.name} · {t.value}
+        </code>
+      </li>
+    ))
+  }
+  {
+    tokens['stroke-width'].map((t) => (
+      <li class="flex flex-col items-center justify-center gap-2" data-token={t.variable}>
+        <span class="flex items-center gap-2 text-brand">
+          <Icon name="mountain" size={32} />
+          <Icon name="compass" size={32} />
+        </span>
+        <code class="text-sm text-muted">
+          stroke-{t.name} · {t.value}
         </code>
       </li>
     ))

@@ -1,0 +1,27 @@
+---
+// Канали клубу плитками: іконка, назва, що там є. Уся плитка — посилання.
+// Список і адреси — з src/lib/channels.ts (адреси беруться з налаштувань сайту).
+import Icon from './Icon.astro';
+import { clubChannels } from '../lib/channels';
+---
+
+<ul data-component="Channels" class="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-3">
+  {
+    clubChannels.map((channel) => (
+      <li>
+        <a
+          class="group flex h-full items-center gap-4 rounded-lg border border-line/soft bg-paper p-4 transition-shadow hover:shadow-md"
+          href={channel.href}
+        >
+          <span class="flex size-12 shrink-0 items-center justify-center rounded-full bg-brand-soft text-brand">
+            <Icon name={channel.icon} size={24} />
+          </span>
+          <span class="min-w-0">
+            <span class="block font-bold break-words text-ink group-hover:text-brand">{channel.label}</span>
+            <span class="block text-sm text-muted">{channel.note}</span>
+          </span>
+        </a>
+      </li>
+    ))
+  }
+</ul>

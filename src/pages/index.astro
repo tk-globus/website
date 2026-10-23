@@ -1,17 +1,87 @@
 ---
-// Тимчасова головна; повноцінну візитівку робить тікет 04.
+// Головна — візитівка клубу, якою можна ділитися: хто ми, чим займаємось, як долучитися, канали.
+// Блоки подій, новин і бібліотеки додадуть наступні тікети — місця для них позначено нижче.
 import BaseLayout from '../layouts/BaseLayout.astro';
-import PageHeader from '../components/PageHeader.astro';
-import Section from '../components/Section.astro';
+import Activities, { type Activity } from '../components/Activities.astro';
+import Button from '../components/Button.astro';
+import Channels from '../components/Channels.astro';
+import Hero from '../components/Hero.astro';
 import Prose from '../components/Prose.astro';
+import Section from '../components/Section.astro';
+import { joinLink } from '../lib/nav';
 import { settings } from '../lib/settings';
+import heroPhoto from '../assets/photos/korostyshiv-2026.jpg';
+
+const activities: Activity[] = [
+  {
+    icon: 'mountain',
+    title: 'Походи',
+    text: 'Походи різних видів і складності — від вихідних у Карпатах до категорійних маршрутів на Кавказі, в Європі та Азії.',
+  },
+  {
+    icon: 'book',
+    title: 'Навчальні секції',
+    text: 'Група А — для новачків, Група Б — для досвідчених туристів. Лекції, тренування й навчальні виїзди.',
+    href: '/join',
+  },
+  {
+    icon: 'tent',
+    title: 'Табір «Глобус»',
+    text: 'Студентський табір у Карпатах неподалік Говерли і школа інструкторів при ньому.',
+  },
+  {
+    icon: 'flag',
+    title: 'Змагання',
+    text: 'Змагання з техніки туризму, орієнтування й виживання: проводимо свої й беремо участь в обласних і всеукраїнських.',
+  },
+  {
+    icon: 'campfire',
+    title: 'Клубні вечори',
+    text: 'Щомісяця, в останню середу: розповіді з походів, лекції, зустрічі з цікавими людьми.',
+  },
+];
 ---
 
 <BaseLayout>
-  <PageHeader title={settings.name} lead={settings.description} />
-  <Section>
+  <Hero
+    image={heroPhoto}
+    alt="Учасники клубу сидять біля багаття в сосновому лісі на виїзді в Коростишів"
+    title={settings.name}
+    lead="Некомерційний туристський клуб з 1952 року. Відкритий для всіх, хто хоче ходити в походи."
+  >
+    <Button href={joinLink.href} size="lg" icon="arrow-right">{joinLink.label}</Button>
+  </Hero>
+
+  <Section title="Хто ми">
     <Prose>
-      <p>Сайт у розробці.</p>
+      <p>
+        «Глобус» — турклуб Київської політехніки, що існує з 1952 року. За цей час тисячі людей побували з клубом у
+        Карпатах, Криму, на Кавказі й Памірі, а серед досягнень учасників — першопроходження й експедиції у
+        важкодоступні райони.
+      </p>
+      <p>
+        Клуб некомерційний: походи, навчання й зустрічі організовують самі учасники, а не турфірма. Заняття відкриті
+        для всіх.
+      </p>
+      <p>
+        Ані вік, ані «вузівська приналежність» значення не мають — приходьте, навіть якщо ніколи не були в поході.
+      </p>
     </Prose>
+  </Section>
+
+  <Section tone="surface" title="Чим ми займаємось">
+    <Activities items={activities} />
+  </Section>
+
+  {/* Тікет 06: три найближчі події. */}
+  {/* Тікет 05b: 3–4 останні новини. */}
+  {/* Тікет 07: вхід у бібліотеку звітів. */}
+
+  <Section title="Канали клубу" intro="Підписуйтеся, щоб бачити анонси походів, лекцій і клубних вечорів.">
+    <Channels />
+  </Section>
+
+  <Section tone="brand" title="Хочете з нами в гори?" intro="Розкажемо, як влаштоване навчання, і допоможемо зробити перший крок.">
+    <Button href={joinLink.href} variant="secondary" size="lg">{joinLink.label}</Button>
   </Section>
 </BaseLayout>

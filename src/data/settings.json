@@ -12,6 +12,10 @@
     "forum": "https://www.tkg.org.ua/forum"
   },
   "address": "Київ, вул. Верхньоключова, 1/26, спортивний (24-й) корпус КПІ",
+  "curators": {
+    "groupA": "Роман Берегун",
+    "groupB": "Тетяна Моянська"
+  },
   "prototypeBanner": {
     "text": "Прототип нового сайту. Офіційний сайт —",
     "linkText": "tkg.org.ua"

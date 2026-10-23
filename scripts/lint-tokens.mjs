@@ -2,7 +2,8 @@
 // Лінт «тільки токени» (ADR 0003): дизайн-значення живуть лише в src/styles/.
 // Компоненти, макети й сторінки беруть кольори, шрифти й відступи з токенів теми.
 // Стандартні значення Tailwind, що оминають тему, вимкнено в theme.css (`initial`); тут ловимо те,
-// що вимкнути не можна: зашиті кольори й числа (прозорість, висота рядка, товщина ліній, тривалість).
+// що вимкнути не можна: зашиті кольори й числа (прозорість, висота рядка, товщина ліній, тривалість,
+// трансформації й фільтри).
 //
 // Використання: node scripts/lint-tokens.mjs [тека…]   (за замовчуванням — src)
 import { readdirSync, readFileSync, statSync } from 'node:fs';
@@ -54,9 +55,22 @@ const RULES = [
   },
   {
     re: new RegExp(
-      `${START}(?:border(?:-[xytrbse])?|divide-[xy]|outline|outline-offset|ring|ring-offset|inset-ring|decoration|underline-offset)-(?!0\\b)\\d+`,
+      `${START}(?:border(?:-[xytrbse])?|divide-[xy]|outline|outline-offset|ring|ring-offset|inset-ring|decoration|underline-offset|stroke)-(?!0\\b)\\d+`,
     ),
-    message: 'товщина чи відступ лінії числом — використай токен (border-thick, underline-offset-link) або додай новий у тему',
+    message:
+      'товщина чи відступ лінії числом — використай токен (border-thick, underline-offset-link, stroke-icon) або додай новий у тему',
+  },
+  {
+    re: /\bstroke-width\s*[=:]/,
+    message: 'зашита товщина ліній SVG — використай утиліту з теми (stroke-icon) або додай нову в theme.css',
+  },
+  {
+    // Трансформації й фільтри не мають токенів у Tailwind; 0 і 100 (без змін) дозволено.
+    re: new RegExp(
+      `${START}-?(?:backdrop-)?(?:scale(?:-[xyz])?|rotate(?:-[xyz])?|skew(?:-[xy])?|brightness|contrast|saturate|hue-rotate|grayscale|invert|sepia)-(?!(?:0|100)\\b)\\d+`,
+    ),
+    message:
+      'трансформація чи фільтр числом — додай іменовану утиліту в theme.css (@utility поверх токена, як stroke-icon) і приклад на /styleguide',
   },
   {
     re: new RegExp(`${START}(?:duration|delay)-\\d+`),
