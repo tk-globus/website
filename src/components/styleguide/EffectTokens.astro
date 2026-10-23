@@ -1,0 +1,101 @@
+---
+// Прозорість, товщина ліній, точки переходу й рух — з theme.css. Іде на /styleguide після ShapeTokens.
+import { tokens, utilityFor } from '../../lib/theme-tokens';
+
+const opacityClass: Record<string, string> = {
+  soft: 'bg-ink/soft',
+  medium: 'bg-ink/medium',
+  disabled: 'bg-ink/disabled',
+  muted: 'bg-ink/muted',
+  lead: 'bg-ink/lead',
+  'scrim-strong': 'bg-ink/scrim-strong',
+  'scrim-mid': 'bg-ink/scrim-mid',
+  'scrim-faint': 'bg-ink/scrim-faint',
+};
+
+const borderClass: Record<string, string> = {
+  thick: 'border-thick',
+};
+
+const underlineClass: Record<string, string> = {
+  link: 'underline-offset-link',
+};
+---
+
+<h3 class="mt-10 font-bold">Прозорість</h3>
+<p class="mt-2 text-sm text-muted">
+  <code class="text-ink">opacity-disabled</code> — для елемента; для кольору — після скісної риски:
+  <code class="text-ink">border-line/soft</code>, <code class="text-ink">text-on-brand/muted</code>.
+</p>
+<ul class="mt-4 grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-4">
+  {
+    tokens.opacity.map((t) => (
+      <li class="flex items-center gap-4" data-token={t.variable}>
+        <span class="size-16 shrink-0 rounded-md border border-line bg-paper">
+          <span class:list={['block size-full rounded-md', utilityFor(opacityClass, 'opacity', t.name)]} />
+        </span>
+        <span class="min-w-0">
+          <code class="block text-sm text-ink">
+            /{t.name} · {t.value}
+          </code>
+          {t.note && <span class="block text-sm text-muted">{t.note}</span>}
+        </span>
+      </li>
+    ))
+  }
+</ul>
+
+<h3 class="mt-10 font-bold">Товщина ліній</h3>
+<ul class="mt-4 flex flex-wrap gap-8">
+  <li class="flex flex-col items-center gap-2">
+    <span class="size-20 rounded-md border border-brand" />
+    <code class="text-sm text-muted">border · 1px</code>
+  </li>
+  {
+    tokens['border-width'].map((t) => (
+      <li class="flex flex-col items-center gap-2" data-token={t.variable}>
+        <span class:list={['size-20 rounded-md border-brand', utilityFor(borderClass, 'border-width', t.name)]} />
+        <code class="text-sm text-muted">
+          border-{t.name} · {t.value}
+        </code>
+      </li>
+    ))
+  }
+  {
+    tokens['text-underline-offset'].map((t) => (
+      <li class="flex flex-col items-center justify-center gap-2" data-token={t.variable}>
+        <span class:list={['text-lg text-brand underline', utilityFor(underlineClass, 'text-underline-offset', t.name)]}>
+          Посилання
+        </span>
+        <code class="text-sm text-muted">
+          underline-offset-{t.name} · {t.value}
+        </code>
+      </li>
+    ))
+  }
+</ul>
+
+<h3 class="mt-10 font-bold">Точки переходу</h3>
+<p class="mt-2 text-sm text-muted">
+  Від якої ширини екрана діє префікс: <code class="text-ink">md:text-4xl</code> — лише від планшета.
+</p>
+<ul class="mt-4 flex flex-col gap-1 text-sm text-muted">
+  {
+    tokens.breakpoint.map((t) => (
+      <li data-token={t.variable}>
+        <code class="text-ink">{t.name}:</code> — від {t.value} ({parseFloat(t.value) * 16} px)
+      </li>
+    ))
+  }
+</ul>
+
+<h3 class="mt-10 font-bold">Рух</h3>
+<ul class="mt-4 flex flex-col gap-1 text-sm text-muted">
+  {
+    tokens['default-transition'].map((t) => (
+      <li data-token={t.variable}>
+        <code class="text-ink">{t.variable}</code> — {t.value}
+      </li>
+    ))
+  }
+</ul>

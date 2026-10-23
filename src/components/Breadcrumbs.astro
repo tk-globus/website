@@ -15,7 +15,7 @@ interface Props {
 const crumbs: Crumb[] = [{ label: 'Головна', href: '/' }, ...Astro.props.items];
 ---
 
-<nav aria-label="Хлібні крихти">
+<nav data-component="Breadcrumbs" aria-label="Хлібні крихти">
   <ol class="flex flex-wrap items-center gap-1 text-sm text-muted">
     {
       crumbs.map((crumb, i) => {
@@ -27,7 +27,7 @@ const crumbs: Crumb[] = [{ label: 'Головна', href: '/' }, ...Astro.props.
                 {crumb.label}
               </span>
             ) : (
-              <a class="underline-offset-2 hover:text-brand hover:underline" href={crumb.href}>
+              <a class="underline-offset-link hover:text-brand hover:underline" href={crumb.href}>
                 {crumb.label}
               </a>
             )}

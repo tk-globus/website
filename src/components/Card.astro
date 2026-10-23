@@ -20,8 +20,9 @@ const Heading = `h${headingLevel}` as const;
 ---
 
 <article
+  data-component="Card"
   class:list={[
-    'group relative flex flex-col overflow-hidden rounded-lg border border-line/40 bg-paper shadow-sm',
+    'group relative flex flex-col overflow-hidden rounded-lg border border-line/soft bg-paper shadow-sm',
     href && 'transition-shadow hover:shadow-md',
   ]}
 >

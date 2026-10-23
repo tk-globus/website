@@ -25,5 +25,6 @@ const { name, size = 24, ...rest } = Astro.props;
   aria-hidden="true"
   focusable="false"
   {...rest}
+  data-component="Icon"
   set:html={iconPaths[name]}
 />

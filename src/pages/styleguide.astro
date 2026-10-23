@@ -15,6 +15,7 @@ import Prose from '../components/Prose.astro';
 import Section from '../components/Section.astro';
 import Tag from '../components/Tag.astro';
 import ColorTokens from '../components/styleguide/ColorTokens.astro';
+import EffectTokens from '../components/styleguide/EffectTokens.astro';
 import IconList from '../components/styleguide/IconList.astro';
 import ShapeTokens from '../components/styleguide/ShapeTokens.astro';
 import SpacingTokens from '../components/styleguide/SpacingTokens.astro';
@@ -28,7 +29,7 @@ const sections = [
   { id: 'colors', label: 'Кольори' },
   { id: 'type', label: 'Типографіка' },
   { id: 'spacing', label: 'Відступи' },
-  { id: 'shapes', label: 'Радіуси й тіні' },
+  { id: 'shapes', label: 'Форма й ефекти' },
   { id: 'buttons', label: 'Кнопки' },
   { id: 'tags', label: 'Мітки й іконки' },
   { id: 'cards', label: 'Картки' },
@@ -71,8 +72,14 @@ const activities: Activity[] = [
     <SpacingTokens />
   </Section>
 
-  <Section id="shapes" tone="surface" title="Радіуси, тіні, ширини">
+  <Section
+    id="shapes"
+    tone="surface"
+    title="Форма й ефекти"
+    intro="Радіуси, тіні, ширини колонок, прозорість, товщина ліній, точки переходу й рух."
+  >
     <ShapeTokens />
+    <EffectTokens />
   </Section>
 
   <Section id="buttons" title="Кнопки" intro="Основна — головна дія на екрані (одна). Вторинна — додаткові дії.">
@@ -182,6 +189,7 @@ const activities: Activity[] = [
     </Specimen>
     <Specimen title="Шапка сторінки" usage={'<PageHeader title="…" lead="…" breadcrumbs={…} />'} bleed>
       <PageHeader
+        headingLevel={2}
         title="Бібліотека звітів"
         lead="Звіти про походи учасників клубу: райони, види туризму, категорії складності."
         breadcrumbs={[{ label: 'Бібліотека' }]}

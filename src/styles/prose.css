@@ -18,14 +18,14 @@
     margin-top: calc(var(--spacing) * 10);
     font-size: var(--text-2xl);
     line-height: var(--text-2xl--line-height);
-    font-weight: 700;
+    font-weight: var(--font-weight-bold);
   }
 
   .prose h3 {
     margin-top: calc(var(--spacing) * 8);
     font-size: var(--text-xl);
     line-height: var(--text-xl--line-height);
-    font-weight: 700;
+    font-weight: var(--font-weight-bold);
   }
 
   .prose a {

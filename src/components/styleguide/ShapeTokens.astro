@@ -16,23 +16,23 @@ const shadowClass: Record<string, string> = {
 };
 ---
 
-<h4 class="font-bold">Радіуси</h4>
+<h3 class="font-bold">Радіуси</h3>
 <ul class="mt-4 flex flex-wrap gap-6">
   {
     tokens.radius.map((t) => (
-      <li class="flex flex-col items-center gap-2">
-        <span class:list={['size-20 border-2 border-brand bg-brand-soft', utilityFor(radiusClass, 'radius', t.name)]} />
+      <li class="flex flex-col items-center gap-2" data-token={t.variable}>
+        <span class:list={['size-20 border-thick border-brand bg-brand-soft', utilityFor(radiusClass, 'radius', t.name)]} />
         <code class="text-sm text-muted">rounded-{t.name}</code>
       </li>
     ))
   }
 </ul>
 
-<h4 class="mt-10 font-bold">Тіні</h4>
+<h3 class="mt-10 font-bold">Тіні</h3>
 <ul class="mt-4 flex flex-wrap gap-8 bg-surface p-6">
   {
     tokens.shadow.map((t) => (
-      <li class="flex flex-col items-center gap-3">
+      <li class="flex flex-col items-center gap-3" data-token={t.variable}>
         <span class:list={['size-24 rounded-lg bg-paper', utilityFor(shadowClass, 'shadow', t.name)]} />
         <code class="text-sm text-muted">shadow-{t.name}</code>
       </li>
@@ -40,11 +40,11 @@ const shadowClass: Record<string, string> = {
   }
 </ul>
 
-<h4 class="mt-10 font-bold">Ширини колонок</h4>
+<h3 class="mt-10 font-bold">Ширини колонок</h3>
 <ul class="mt-4 flex flex-col gap-1 text-sm text-muted">
   {
     tokens.container.map((t) => (
-      <li>
+      <li data-token={t.variable}>
         <code class="text-ink">max-w-{t.name}</code> — {t.value}
       </li>
     ))

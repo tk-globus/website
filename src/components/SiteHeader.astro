@@ -1,6 +1,7 @@
 ---
 // Шапка: логотип, меню, кнопка «Долучитися». Пункти — у src/lib/nav.ts.
 // На компʼютері (від lg) меню в рядок; на телефоні й планшеті — згорнуте під кнопку «Меню».
+// На найвужчих телефонах (320 px) логотип стискається пропорційно, щоб кнопка «Закрити» не виходила за край.
 import logo from '../assets/logo.svg';
 import { settings } from '../lib/settings';
 import { joinLink } from '../lib/nav';
@@ -10,10 +11,16 @@ import Icon from './Icon.astro';
 import NavMenu from './NavMenu.astro';
 ---
 
-<header class="sticky top-0 z-30 border-b border-line/40 bg-paper">
+<header data-component="SiteHeader" class="sticky top-0 z-30 border-b border-line/soft bg-paper">
   <Container class="flex items-center justify-between gap-4 py-3">
-    <a href="/" class="shrink-0">
-      <img src={logo.src} alt={settings.name} width={logo.width} height={logo.height} class="h-9 w-auto lg:h-10" />
+    <a href="/" class="min-w-0">
+      <img
+        src={logo.src}
+        alt={settings.name}
+        width={logo.width}
+        height={logo.height}
+        class="h-9 w-auto max-w-full object-contain object-left lg:h-10"
+      />
     </a>
     <nav aria-label="Головне меню" class="hidden lg:block">
       <NavMenu layout="row" />
@@ -23,7 +30,7 @@ import NavMenu from './NavMenu.astro';
     </div>
     <button
       type="button"
-      class="inline-flex items-center gap-2 rounded-md border border-line px-3 py-2 text-sm font-semibold hover:bg-brand-soft lg:hidden"
+      class="inline-flex shrink-0 items-center gap-2 rounded-md border border-line px-3 py-2 text-sm font-semibold hover:bg-brand-soft lg:hidden"
       aria-expanded="false"
       aria-controls="mobile-menu"
       data-menu-toggle
@@ -33,7 +40,7 @@ import NavMenu from './NavMenu.astro';
       <span data-menu-label>Меню</span>
     </button>
   </Container>
-  <div id="mobile-menu" class="border-t border-line/40 bg-paper shadow-lg lg:hidden" hidden>
+  <div id="mobile-menu" class="border-t border-line/soft bg-paper shadow-lg lg:hidden" hidden>
     <Container class="py-4">
       <nav aria-label="Головне меню">
         <NavMenu layout="column" />

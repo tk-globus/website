@@ -4,9 +4,11 @@
  * (bg-brand, text-ink, p-4, rounded-md, shadow-sm, font-sans…). Зашиті значення поза src/styles/
  * ловить `npm run lint:tokens`.
  *
- * Стандартні кольори, шрифти, розміри тексту, радіуси, тіні й ширини Tailwind вимкнено (`initial`),
- * тож існують лише токени нижче. Утиліта з неіснуючим токеном (напр. `rounded-xl`) нічого не дає —
- * звіряйся з /styleguide, яка показує всі токени.
+ * Стандартні значення Tailwind, що мають бути в темі (кольори, шрифти, накреслення, розміри тексту,
+ * висота рядка, радіуси, тіні, прозорість, ширини, точки переходу…), вимкнено (`initial`), тож існують
+ * лише токени нижче. Утиліта з неіснуючим токеном (напр. `rounded-xl`, `font-light`) нічого не дає —
+ * звіряйся з /styleguide, яка показує всі токени. Числа в обхід теми (`opacity-60`, `border-line/40`,
+ * `border-2`) ловить лінт.
  *
  * Редизайн = нові значення тут + правки компонентів. Сторінки не змінюються.
  */
@@ -52,6 +54,20 @@
   --text-5xl: 3.25rem;
   --text-5xl--line-height: 1.1;
 
+  /* Накреслення: font-normal, font-semibold… Manrope має всі накреслення від 200 до 800 */
+  --font-weight-*: initial;
+  --font-weight-normal: 400; /* основний текст */
+  --font-weight-semibold: 600; /* кнопки, меню, мітки */
+  --font-weight-bold: 700; /* заголовки */
+  --font-weight-extrabold: 800; /* заголовок героя */
+
+  /* Висота рядка окремо від розміру тексту: leading-snug */
+  --leading-*: initial;
+  --leading-snug: 1.375; /* заголовки карток у кілька рядків */
+
+  /* Відстань між літерами — поки лише стандартна */
+  --tracking-*: initial;
+
   /* Відступи: один крок шкали; p-4 = 4 × крок = 1rem. Уживані кроки: 1 2 3 4 6 8 12 16 24 */
   --spacing: 0.25rem;
 
@@ -67,9 +83,42 @@
   --shadow-sm: 0 1px 2px rgb(1 1 1 / 0.06), 0 2px 8px rgb(22 102 108 / 0.08);
   --shadow-md: 0 2px 4px rgb(1 1 1 / 0.06), 0 8px 24px rgb(22 102 108 / 0.16);
   --shadow-lg: 0 4px 8px rgb(1 1 1 / 0.08), 0 16px 40px rgb(22 102 108 / 0.2);
+  --inset-shadow-*: initial;
+  --drop-shadow-*: initial;
+  --text-shadow-*: initial;
+  --blur-*: initial;
+
+  /* Прозорість: opacity-disabled, а для кольору — після скісної риски: border-line/soft, text-on-brand/muted */
+  --opacity-soft: 40%; /* тонкі лінії-розділювачі: border-line/soft */
+  --opacity-medium: 60%; /* помітніші рамки: пунктир порожнього стану, зразки */
+  --opacity-disabled: 60%; /* неактивна кнопка: opacity-disabled */
+  --opacity-muted: 85%; /* другорядний текст на бірюзовому фоні: text-on-brand/muted */
+  --opacity-lead: 90%; /* вступ на фото героя: text-on-brand/lead */
+  --opacity-scrim-strong: 80%; /* затемнення фото героя: внизу, під текстом */
+  --opacity-scrim-mid: 35%; /* затемнення фото героя: посередині */
+  --opacity-scrim-faint: 5%; /* затемнення фото героя: вгорі */
+
+  /* Товщина ліній: border — 1px (тонка, за замовчуванням), border-thick; підкреслення посилань */
+  --border-width-thick: 2px; /* рамка кнопок, пунктир порожнього стану */
+  --text-underline-offset-link: 2px; /* відступ підкреслення при наведенні: underline-offset-link */
 
   /* Ширини: max-w-page — контентна колонка, max-w-text — зручна ширина для читання тексту */
   --container-*: initial;
   --container-page: 72rem;
   --container-text: 42rem;
+  --max-width-*: initial;
+
+  /* Точки переходу (ширина екрана): sm: — великий телефон, md: — планшет, lg: — компʼютер */
+  --breakpoint-*: initial;
+  --breakpoint-sm: 40rem;
+  --breakpoint-md: 48rem;
+  --breakpoint-lg: 64rem;
+
+  /* Рух: тривалість і плавність переходів (transition-colors, transition-shadow) */
+  --default-transition-duration: 150ms;
+  --default-transition-timing-function: cubic-bezier(0.4, 0, 0.2, 1);
+  --ease-*: initial;
+  --animate-*: initial;
+  --perspective-*: initial;
+  --aspect-*: initial;
 }

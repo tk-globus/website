@@ -13,6 +13,7 @@ const isCurrent = (href: string) => current === href || current.startsWith(`${hr
 ---
 
 <ul
+  data-component="NavMenu"
   class:list={[
     layout === 'row' ? 'flex items-center gap-x-1 text-sm' : 'flex flex-col text-base',
   ]}

@@ -1,5 +1,5 @@
 ---
-// Типографіка: шрифт, шкала розмірів тексту і накреслення — з theme.css.
+// Типографіка: шрифт, шкала розмірів тексту, накреслення й висота рядка — з theme.css.
 import { tokens, utilityFor } from '../../lib/theme-tokens';
 
 const sizeClass: Record<string, string> = {
@@ -14,12 +14,16 @@ const sizeClass: Record<string, string> = {
   '5xl': 'text-5xl',
 };
 
-const weights = [
-  { label: 'Звичайний (font-normal)', cls: 'font-normal' },
-  { label: 'Напівжирний (font-semibold)', cls: 'font-semibold' },
-  { label: 'Жирний (font-bold)', cls: 'font-bold' },
-  { label: 'Дуже жирний (font-extrabold)', cls: 'font-extrabold' },
-];
+const weightClass: Record<string, string> = {
+  normal: 'font-normal',
+  semibold: 'font-semibold',
+  bold: 'font-bold',
+  extrabold: 'font-extrabold',
+};
+
+const leadingClass: Record<string, string> = {
+  snug: 'leading-snug',
+};
 
 const sample = 'Ґанок, їжак і єнот ідуть на перевал';
 ---
@@ -27,7 +31,7 @@ const sample = 'Ґанок, їжак і єнот ідуть на перевал'
 <div>
   {
     tokens.font.map((t) => (
-      <p class="text-sm text-muted">
+      <p class="text-sm text-muted" data-token={t.variable}>
         <span class="font-bold text-ink">font-{t.name}:</span> <code>{t.value}</code>
       </p>
     ))
@@ -37,11 +41,11 @@ const sample = 'Ґанок, їжак і єнот ідуть на перевал'
   </p>
 </div>
 
-<h4 class="mt-10 font-bold">Розміри тексту</h4>
+<h3 class="mt-10 font-bold">Розміри тексту</h3>
 <ul class="mt-4 flex flex-col gap-4">
   {
     tokens.text.map((t) => (
-      <li class="flex flex-col gap-1 border-b border-line/40 pb-4 sm:flex-row sm:items-baseline sm:gap-6">
+      <li data-token={t.variable} class="flex flex-col gap-1 border-b border-line/soft pb-4 sm:flex-row sm:items-baseline sm:gap-6">
         <code class="w-32 shrink-0 text-sm text-muted">
           text-{t.name} · {t.value}
         </code>
@@ -51,12 +55,31 @@ const sample = 'Ґанок, їжак і єнот ідуть на перевал'
   }
 </ul>
 
-<h4 class="mt-10 font-bold">Накреслення</h4>
+<h3 class="mt-10 font-bold">Накреслення</h3>
 <ul class="mt-4 flex flex-col gap-2 text-lg">
   {
-    weights.map((w) => (
-      <li class={w.cls}>
-        {w.label} — {sample}
+    tokens['font-weight'].map((t) => (
+      <li class={utilityFor(weightClass, 'font-weight', t.name)} data-token={t.variable}>
+        font-{t.name} · {t.value} — {sample}
+      </li>
+    ))
+  }
+</ul>
+
+<h3 class="mt-10 font-bold">Висота рядка</h3>
+<p class="mt-2 text-sm text-muted">
+  Зазвичай іде разом із розміром тексту (див. вище). Окремо — для заголовків у кілька рядків:
+</p>
+<ul class="mt-4 flex flex-col gap-4">
+  {
+    tokens.leading.map((t) => (
+      <li class="flex flex-col gap-1 sm:flex-row sm:items-baseline sm:gap-6" data-token={t.variable}>
+        <code class="w-32 shrink-0 text-sm text-muted">
+          leading-{t.name} · {t.value}
+        </code>
+        <span class:list={['max-w-text text-lg font-bold', utilityFor(leadingClass, 'leading', t.name)]}>
+          Пішохідний похід другої категорії складності Чорногорою та Свидовцем
+        </span>
       </li>
     ))
   }
