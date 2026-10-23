@@ -6,7 +6,7 @@
 import { existsSync, mkdirSync, readFileSync, readdirSync, writeFileSync } from 'node:fs';
 import { basename, dirname, extname, join, relative, sep } from 'node:path';
 import YAML from 'yaml';
-import { htmlToMarkdown, isOldSiteFile, load, nodeId } from './html.mjs';
+import { htmlToMarkdown, isOldSiteFile, nodeId } from './html.mjs';
 import { slugify } from './slug.mjs';
 
 // Формати, які вміє оптимізувати збірка Astro. Інші фото лишаються посиланням на старий сайт.
@@ -74,8 +74,13 @@ const toPosix = (p) => p.split(sep).join('/');
  * @param {{ root: string, fetcher: object, index: object }} ctx
  */
 export async function importItem(type, url, { root, fetcher, index }) {
-  const warnings = [];
   const parsed = type.parse(await fetcher.text(url), url);
+  // Парсер може повернути власні попередження і значення, яких немає в переліках схеми (звіти).
+  const unrecognized = parsed.unrecognized ?? [];
+  const warnings = [
+    ...unrecognized.map(({ field, value }) => `не розпізнано ${field} «${value}» — пропущено`),
+    ...(parsed.warnings ?? []),
+  ];
   const slug = chooseSlug(parsed, index);
   const mdPath = join(root, type.contentDir, `${slug}.md`);
   const assetDir = join(root, type.assetsDir, slug);
@@ -114,11 +119,15 @@ export async function importItem(type, url, { root, fetcher, index }) {
   const cover = parsed.cover ? await localImage(parsed.cover.src) : null;
   if (!parsed.cover) warnings.push('без обкладинки (у тексті немає фото)');
 
+  // Завантажуємо лише фото, що стануть Markdown-картинками. Фото всередині сирого HTML (таблиці з
+  // обʼєднаними клітинками) лишаються посиланням на старий сайт: збірка відносних шляхів у HTML не бачить.
+  // Пробний прогін: кожне фото отримує мітку; мітки, що дійшли до Markdown, — це фото поза сирим HTML.
+  const seen = [];
+  const draft = htmlToMarkdown(parsed.bodyHtml, { resolveImage: (src) => `tkg-image-${seen.push(src)}-` });
   const imageMap = new Map();
-  const $ = load(parsed.bodyHtml);
-  for (const img of $('img[src]').get()) {
-    const src = $(img).attr('src');
-    if (isOldSiteFile(src) && !imageMap.has(src)) imageMap.set(src, (await localImage(src)) ?? src);
+  for (const [i, src] of seen.entries()) {
+    if (!draft.includes(`tkg-image-${i + 1}-`) || !isOldSiteFile(src) || imageMap.has(src)) continue;
+    imageMap.set(src, (await localImage(src)) ?? src);
   }
   const markdown = htmlToMarkdown(parsed.bodyHtml, { resolveImage: (src) => imageMap.get(src) ?? src });
 
@@ -138,7 +147,23 @@ export async function importItem(type, url, { root, fetcher, index }) {
     mkdirSync(dirname(mdPath), { recursive: true });
     writeFileSync(mdPath, text);
   }
-  return { slug, file: toPosix(relative(root, mdPath)), status, warnings };
+  return { slug, file: toPosix(relative(root, mdPath)), status, warnings, unrecognized };
+}
+
+/**
+ * Звіт про ненормалізовані значення: те саме значення з кількох записів — одним рядком.
+ * @returns {{ field: string, value: string, slugs: string[] }[]} за полем, далі за значенням
+ */
+export function summarizeUnrecognized(results) {
+  const groups = new Map();
+  for (const { slug, unrecognized = [] } of results) {
+    for (const { field, value } of unrecognized) {
+      const key = `${field}\u0000${value}`;
+      if (!groups.has(key)) groups.set(key, { field, value, slugs: [] });
+      groups.get(key).slugs.push(slug);
+    }
+  }
+  return [...groups.values()].sort((a, b) => a.field.localeCompare(b.field, 'uk') || a.value.localeCompare(b.value, 'uk'));
 }
 
 /** Адреси для імпорту: вибірка з аудиту або всі записи зі сторінок-списків старого сайту. */

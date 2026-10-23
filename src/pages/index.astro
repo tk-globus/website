@@ -4,12 +4,15 @@
 import BaseLayout from '../layouts/BaseLayout.astro';
 import Activities, { type Activity } from '../components/Activities.astro';
 import Button from '../components/Button.astro';
+import CardGrid from '../components/CardGrid.astro';
 import Channels from '../components/Channels.astro';
 import Hero from '../components/Hero.astro';
 import Prose from '../components/Prose.astro';
+import ReportCard from '../components/ReportCard.astro';
 import Section from '../components/Section.astro';
 import { joinLink } from '../lib/nav';
 import { settings } from '../lib/settings';
+import { getReports, reportHref, reportsCount } from '../lib/reports';
 import heroPhoto from '../assets/photos/korostyshiv-2026.jpg';
 
 const activities: Activity[] = [
@@ -40,6 +43,9 @@ const activities: Activity[] = [
     text: 'Щомісяця, в останню середу: розповіді з походів, лекції, зустрічі з цікавими людьми.',
   },
 ];
+
+// Тікет 07: вхід у бібліотеку — три найсвіжіші звіти.
+const reports = await getReports();
 ---
 
 <BaseLayout>
@@ -75,7 +81,31 @@ const activities: Activity[] = [
 
   {/* Тікет 06: три найближчі події. */}
   {/* Тікет 05b: 3–4 останні новини. */}
-  {/* Тікет 07: вхід у бібліотеку звітів. */}
+  <Section
+    tone="surface"
+    title="Бібліотека звітів"
+    intro={`${reportsCount(reports.length)} про походи учасників клубу — Карпати, Кавказ, Тянь-Шань, Памір: нитки маршрутів, фото й PDF.`}
+  >
+    <Button slot="action" href="/library" variant="secondary" icon="arrow-right">Уся бібліотека</Button>
+    <CardGrid columns={3}>
+      {
+        reports.slice(0, 3).map((entry) => (
+          <ReportCard
+            title={entry.data.title}
+            href={reportHref(entry)}
+            kind={entry.data.kind}
+            grade={entry.data.grade}
+            regions={entry.data.regions}
+            year={entry.data.year}
+            authors={entry.data.authors}
+            route={entry.data.route}
+            image={entry.data.cover}
+            imageAlt={entry.data.coverAlt}
+          />
+        ))
+      }
+    </CardGrid>
+  </Section>
 
   <Section title="Канали клубу" intro="Підписуйтеся, щоб бачити анонси походів, лекцій і клубних вечорів.">
     <Channels />

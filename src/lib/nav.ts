@@ -9,7 +9,7 @@ export const mainNav: NavItem[] = [
   { label: 'Про клуб', href: null },
   { label: 'Новини', href: '/news' },
   { label: 'Події', href: null },
-  { label: 'Бібліотека', href: null },
+  { label: 'Бібліотека', href: '/library' },
   { label: 'МКК', href: null },
   { label: 'Табір', href: null },
 ];

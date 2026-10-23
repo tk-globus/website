@@ -134,6 +134,43 @@ export function prepareBody($, body) {
   return images;
 }
 
+/**
+ * Посилання змісту на якорі сторінки (`#item_3.5`): якорів у Markdown немає, тож лишаємо лише текст —
+ * інакше вони стали б посиланнями на головну старого сайту. Викликати до prepareBody.
+ */
+export function unwrapAnchorLinks($, body) {
+  body.find('a[href^="#"]').each((_, a) => {
+    $(a).replaceWith($(a).contents());
+  });
+}
+
+/**
+ * Таблиці-розкладки старих звітів (галереї фото по 3–4 в ряд, рядок фото + рядок підписів, текст поруч
+ * із фото): фото є щонайменше в половині непорожніх клітинок. Markdown таких таблиць не вміє (лишив би
+ * сирий HTML без локальних фото), тож розгортаємо їх у абзаци — по клітинці на абзац. Таблиці з даними
+ * (склад групи з фото учасників, нитка по днях, кошторис) не чіпаємо: там фото рідко.
+ */
+export function flattenLayoutTables($, body) {
+  // Спершу вкладені: зовнішня таблиця-розкладка часто тримає внутрішні галереї.
+  for (const table of body.find('table').get().reverse()) {
+    const cells = $(table).find('td, th').filter((_, td) => $(td).find('img').length || cleanText($(td).text()));
+    const withImage = cells.filter((_, td) => $(td).find('img').length).length;
+    if (!withImage || withImage * 2 < cells.length) continue;
+    $(table).replaceWith(cells.map((_, td) => `<p>${$(td).html()}</p>`).get().join(''));
+  }
+}
+
+// Атрибути оформлення старого сайту. Markdown їх не переносить, але таблиці з обʼєднаними клітинками
+// лишаються сирим HTML — і тягнули б у сайт стилі в обхід теми (ADR 0003).
+const PRESENTATION_ATTRS = ['style', 'class', 'align', 'valign', 'border', 'cellpadding', 'cellspacing', 'width', 'height', 'bgcolor'];
+
+/** Прибирає атрибути оформлення з усіх елементів фрагмента (після того, як парсер узяв, що треба). */
+export function stripPresentation($, body) {
+  body.find('*').each((_, el) => {
+    for (const attr of PRESENTATION_ATTRS) $(el).removeAttr(attr);
+  });
+}
+
 const isBlank = (node) => node.type === 'text' && !node.data.replace(/[\s\u00a0]/g, '');
 
 /** Переноси рядка `<br>` на початку чи в кінці абзацу нічого не переносять — прибираємо. */

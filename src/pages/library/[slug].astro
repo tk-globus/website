@@ -1,0 +1,80 @@
+---
+// Сторінка звіту: метадані (район, вид, к.с., рік, автори, нитка маршруту…), файли звіту на старому сайті
+// з розміром (PDF не копіюємо — ADR 0004), опис і фото. Посилання на оригінал — щоб звірити з tkg.org.ua.
+import { Image } from 'astro:assets';
+import { render } from 'astro:content';
+import BaseLayout from '../../layouts/BaseLayout.astro';
+import PageHeader from '../../components/PageHeader.astro';
+import Section from '../../components/Section.astro';
+import Facts from '../../components/Facts.astro';
+import Cluster from '../../components/Cluster.astro';
+import Button from '../../components/Button.astro';
+import Tag from '../../components/Tag.astro';
+import Prose from '../../components/Prose.astro';
+import { fileLabel, getReports, gradeLabel, type Report } from '../../lib/reports';
+
+export async function getStaticPaths() {
+  const reports = await getReports();
+  return reports.map((entry) => ({ params: { slug: entry.id }, props: { entry } }));
+}
+
+const { entry } = Astro.props as { entry: Report };
+const { title, kind, grade, regions = [], year, authors = [], route, countries, season, material, files = [] } = entry.data;
+const { cover, coverAlt, description, legacyUrl } = entry.data;
+const { Content } = await render(entry);
+---
+
+<BaseLayout title={title} description={description}>
+  <PageHeader title={title} breadcrumbs={[{ label: 'Бібліотека', href: '/library' }, { label: title }]}>
+    <Cluster gap="sm">
+      {regions.map((region) => <Tag>{region}</Tag>)}
+      <Tag>{kind}</Tag>
+      {grade && <Tag tone="accent">{gradeLabel(grade)}</Tag>}
+      {year && <Tag tone="neutral">{year}</Tag>}
+    </Cluster>
+  </PageHeader>
+  <Section>
+    <Facts
+      items={[
+        { label: regions.length > 1 ? 'Райони' : 'Район', value: regions },
+        { label: 'Вид туризму', value: kind },
+        { label: 'Категорія складності', value: grade && gradeLabel(grade) },
+        { label: 'Рік', value: year },
+        { label: authors.length > 1 ? 'Автори' : 'Автор', value: authors },
+        { label: 'Сезон', value: season },
+        { label: (countries?.length ?? 0) > 1 ? 'Країни' : 'Країна', value: countries },
+        { label: 'Тип матеріалу', value: material },
+        { label: 'Нитка маршруту', value: route, wide: true },
+      ]}
+    />
+  </Section>
+  {
+    files.length > 0 && (
+      <Section tone="surface" title="Звіт повністю" intro="Файл лежить на старому сайті клубу tkg.org.ua.">
+        <Cluster>
+          {files.map((file, i) => (
+            <Button href={file.url} variant={i === 0 ? 'primary' : 'secondary'} icon="download">
+              {files.length === 1 ? 'Завантажити звіт' : file.name} ({fileLabel(file)})
+            </Button>
+          ))}
+        </Cluster>
+      </Section>
+    )
+  }
+  <Section title="Опис">
+    <Prose>
+      {
+        cover && (
+          <Image
+            src={cover}
+            alt={coverAlt ?? ''}
+            widths={[...new Set([400, 800, 1200].map((w) => Math.min(w, cover.width)))]}
+            sizes="(min-width: 48rem) 42rem, 100vw"
+          />
+        )
+      }
+      <Content />
+      <p><a href={legacyUrl}>Оригінал на старому сайті</a></p>
+    </Prose>
+  </Section>
+</BaseLayout>

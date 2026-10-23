@@ -19,7 +19,7 @@ const Heading = `h${headingLevel}` as const;
 <div data-component="PageHeader" class="border-b border-line/soft bg-surface">
   <Container class="py-10 md:py-14">
     {breadcrumbs && <Breadcrumbs items={breadcrumbs} />}
-    <Heading class:list={['text-3xl font-bold text-brand md:text-4xl', breadcrumbs && 'mt-4']}>{title}</Heading>
+    <Heading class:list={['text-3xl font-bold text-brand wrap-break-word md:text-4xl', breadcrumbs && 'mt-4']}>{title}</Heading>
     {lead && <p class="mt-4 max-w-text text-lg text-muted">{lead}</p>}
     {
       Astro.slots.has('default') && (

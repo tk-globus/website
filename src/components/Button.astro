@@ -19,7 +19,8 @@ const { href, variant = 'primary', size = 'md', full = false, icon, type = 'butt
 const disabled = href === null;
 
 const classes = [
-  'inline-flex items-center justify-center gap-2 rounded-md border-thick font-semibold transition-colors',
+  // max-w-full і wrap-anywhere: довгий підпис (назва файлу) переноситься, а не розсуває вузький екран.
+  'inline-flex max-w-full items-center justify-center gap-2 rounded-md border-thick font-semibold wrap-anywhere transition-colors',
   {
     primary: 'border-brand bg-brand text-on-brand',
     secondary: 'border-brand bg-paper text-brand',
@@ -39,17 +40,17 @@ const classes = [
   disabled ? (
     <span data-component="Button" class:list={classes} aria-disabled="true" title="Сторінка в розробці">
       <slot />
-      {icon && <Icon name={icon} size={18} />}
+      {icon && <Icon name={icon} size={18} class="shrink-0" />}
     </span>
   ) : href ? (
     <a data-component="Button" class:list={classes} href={href}>
       <slot />
-      {icon && <Icon name={icon} size={18} />}
+      {icon && <Icon name={icon} size={18} class="shrink-0" />}
     </a>
   ) : (
     <button data-component="Button" class:list={classes} type={type}>
       <slot />
-      {icon && <Icon name={icon} size={18} />}
+      {icon && <Icon name={icon} size={18} class="shrink-0" />}
     </button>
   )
 }

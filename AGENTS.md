@@ -36,6 +36,7 @@ Astro (статична генерація) + Tailwind CSS 4. Хостинг —
 | `npm run test:smoke` | смоук-тести Playwright проти зібраного сайту (після build) |
 | `npm run check` | усе разом — те саме, що CI. Запускай перед PR |
 | `npm run import -- news` | імпорт новин зі старого сайту (див. «Імпортер»); не частина збірки й CI |
+| `npm run import -- reports` | імпорт звітів про походи (бібліотека) зі старого сайту |
 
 Перший запуск смоук-тестів: `npx playwright install chromium`.
 
@@ -51,11 +52,14 @@ src/
 ├── content.config.ts    ← колекції контенту (новини…): де лежать файли і якою схемою перевіряються
 ├── content/news/        ← НОВИНИ: Markdown-файли (frontmatter + текст), пише імпортер, можна правити руками
 ├── assets/news/<slug>/  ← фото новин (оригінали зі старого сайту); збірка їх оптимізує
+├── content/reports/     ← ЗВІТИ про походи (бібліотека): Markdown-файли, пише імпортер; фото — assets/reports/<slug>/
 ├── data/settings.json   ← налаштування сайту: назва, опис, канали клубу, адреса, текст банера
 ├── lib/settings.ts      ← схема налаштувань (невалідний файл ламає збірку)
-├── lib/schemas/         ← схеми контенту (news.ts) і спільні поля (fields.ts: дата РРРР-ММ-ДД)
+├── lib/schemas/         ← схеми контенту (news.ts, report.ts — з переліками виду, к.с., районів) і спільні
+│                          поля (fields.ts: дата РРРР-ММ-ДД)
 ├── lib/raw-dates.ts     ← передає схемі дату як написано у файлі (YAML тихо «виправляє» 2026-13-45)
 ├── lib/news.ts, dates.ts ← новини для сторінок (найновіші першими), формат дат «8 жовтня 2026»
+├── lib/reports.ts       ← звіти для сторінок (найсвіжіші першими), підписи «2 к.с.», «PDF, 23 МБ», «44 звіти»
 ├── lib/nav.ts           ← пункти меню; href: null — сторінки ще немає
 ├── lib/icons.ts         ← шляхи іконок (компонент Icon)
 ├── lib/channels.ts      ← канали клубу (підписи й іконки; адреси — з settings.json): підвал і головна
@@ -72,7 +76,7 @@ src/
 public/                  ← robots.txt, _headers (noindex), favicon
 scripts/                 ← lint-tokens.mjs, check-links.mjs
 scripts/import/          ← ІМПОРТЕР зі старого сайту (див. «Імпортер»)
-tests/smoke/             ← смоук-тести Playwright; routes.ts — список маршрутів (+ кожна новина з content/)
+tests/smoke/             ← смоук-тести Playwright; routes.ts — список маршрутів (+ кожна новина й звіт з content/)
 tests/scripts/           ← тести скриптів (лінт, імпортер — без мережі)
 tests/fixtures/old-site/ ← збережені сторінки старого сайту (копія planning/research/fixtures/old-site/)
 .github/workflows/ci.yml ← CI на кожен PR і push у main
@@ -92,6 +96,8 @@ tests/fixtures/old-site/ ← збережені сторінки старого 
 | `Breadcrumbs` | хлібні крихти («Головна» додається сама) |
 | `Button` | кнопка/посилання: `variant` primary / secondary, `size` md / lg, `href: null` — неактивна |
 | `Card` | базова картка (фото, слоти `meta` і `footer`); основа карток новини, події, звіту |
+| `ReportCard` | картка звіту: фото, мітки району, виду й к.с., нитка маршруту, рік і автор |
+| `Facts` | список «назва — значення» (метадані звіту, події); `wide` — на всю ширину |
 | `CardGrid` | сітка карток: 1 → 2 → `columns` колонки |
 | `Activities` | блок «напрями діяльності» (іконка, назва, текст; годиться й для форматів навчання) |
 | `Channels` | канали клубу плитками-посиланнями (з `lib/channels.ts`) |
@@ -113,6 +119,8 @@ npm run import -- news                 # вибірка для прототип�
 npm run import -- news --scope all     # усі новини зі сторінок архіву (терміни 2191, 2180 — роки 2021–2026)
 npm run import -- news --limit 3       # лише перші 3
 npm run import -- news --refresh       # завантажити заново, а не з кешу
+npm run import -- reports              # звіти: 44 з аудиту (samples/reports.json)
+npm run import -- reports --scope all  # уся бібліотека з пошуку старого сайту /trip_search (14 сторінок)
 ```
 
 - **Ввічливий режим:** кеш сторінок і фото в `.cache/old-site/` (у `.gitignore`), пауза 1,5–2 с між
@@ -125,11 +133,15 @@ npm run import -- news --refresh       # завантажити заново, а
   обкладинкою (`cover`) і з тексту прибирається. Посилання на старий сайт стають абсолютними.
 - **Звіт:** `+ нове`, `~ оновлено`, `= без змін`, `!` попередження (немає обкладинки…), `✗` помилка.
   Помилка одного запису не зупиняє інші, але код виходу — 1.
+- **Нормалізація (звіти):** вид, к.с., район, рік, сезон і тип матеріалу зводяться до переліків схеми
+  (`src/lib/schemas/report.ts`). Значення поза переліком пропускається (невідомий вид → «інше»), а в кінці
+  звіту імпорту є список «Не вдалося нормалізувати»: поле, значення і в яких записах. Автор-посилання
+  (cutt.ly) теж іде туди. PDF не завантажуються: у `files` — назва, адреса на старому сайті й розмір.
 
 Будова: `index.mjs` (командний рядок) → `core.mjs` (адреси, slug, фото, запис файлів — спільне для всіх
 типів) → `types/<тип>.mjs` (парсер одного типу) з помічниками `html.mjs` (дати, фото-оригінали,
-списки-тизери, HTML → Markdown), `fetcher.mjs` (кеш і паузи), `slug.mjs`. Вибірка — `samples/news-events.json`
-(копія `planning/research/data/news-events-sample.json`).
+списки-тизери, HTML → Markdown), `fetcher.mjs` (кеш і паузи), `slug.mjs`. Вибірки — `samples/news-events.json`
+і `samples/reports.json` (копії `planning/research/data/news-events-sample.json` і `reports-sample.json`).
 
 **Новий тип контенту** (подія, звіт, сторінка):
 1. Схема `src/lib/schemas/<тип>.ts` (лише `astro/zod`, дати — `isoDate()`), колекція в `src/content.config.ts`
