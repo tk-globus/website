@@ -1,0 +1,19 @@
+{
+  "name": "Турклуб КПІ «Глобус»",
+  "shortName": "Глобус",
+  "description": "Некомерційний туристський клуб КПІ з 1952 року, відкритий для всіх: походи, навчальні секції, табір, змагання, клубні вечори.",
+  "channels": {
+    "telegram": "https://t.me/tkgkpi",
+    "instagram": "https://www.instagram.com/turclubglobus",
+    "youtube": "https://www.youtube.com/@tkg-org-ua",
+    "facebook": "https://www.facebook.com/tkg.org.ua",
+    "email": "info@tkg.org.ua",
+    "oldSite": "https://www.tkg.org.ua",
+    "forum": "https://www.tkg.org.ua/forum"
+  },
+  "address": "Київ, вул. Верхньоключова, 1/26, спортивний (24-й) корпус КПІ",
+  "prototypeBanner": {
+    "text": "Прототип нового сайту. Офіційний сайт —",
+    "linkText": "tkg.org.ua"
+  }
+}

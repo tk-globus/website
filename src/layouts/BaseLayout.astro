@@ -1,0 +1,36 @@
+---
+// Базовий макет: кожна сторінка обгортається ним. Тут — noindex, банер прототипу, шапка й підвал.
+import '../styles/global.css';
+import PrototypeBanner from '../components/PrototypeBanner.astro';
+import SiteHeader from '../components/SiteHeader.astro';
+import SiteFooter from '../components/SiteFooter.astro';
+import { settings } from '../lib/settings';
+
+interface Props {
+  title?: string;
+  description?: string;
+}
+
+const { title, description = settings.description } = Astro.props;
+const fullTitle = title ? `${title} — ${settings.shortName}` : settings.name;
+---
+
+<!doctype html>
+<html lang="uk">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <meta name="robots" content="noindex, nofollow" />
+    <title>{fullTitle}</title>
+    <meta name="description" content={description} />
+    <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
+  </head>
+  <body class="flex min-h-screen flex-col">
+    <PrototypeBanner />
+    <SiteHeader />
+    <main class="mx-auto w-full max-w-page flex-1 px-4 py-8">
+      <slot />
+    </main>
+    <SiteFooter />
+  </body>
+</html>
