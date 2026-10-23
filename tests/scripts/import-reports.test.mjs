@@ -165,6 +165,28 @@ test('нитка маршруту, поділена на кілька span.route
   assert.match(data.route, /^Вдсп\. Шипот – хр\. Полонина Боржава – хр\. Палений Грунь – р\. Ріка – .* – Буковель \(с\.Паляниця\)$/);
 });
 
+test('кілька різних ниток на сторінці (заявлена / пройдена, походи табору) — береться перша, без злиття', async (t) => {
+  const first = '<span class="route">Вдсп. Шипот – хр. Полонина Боржава – хр. Палений Грунь';
+  // Як на старому сайті (node/27886, node/8369): друга нитка після підпису.
+  const declared = REPORT.replace(
+    first,
+    '<span class="route">с. Ясіня – г. Петрос</span></p><p>2.3.1. Заявленная нитка похода:</p><p>' + first,
+  );
+  // Як у звіті табору (node/36853): походи через пробіл, без тире на стику.
+  const camp = REPORT.replace(
+    first,
+    '<span class="route">Ясиня - г.Петрос - т/б “Глобус”</span> <span class="route">Кваси - г.Говерла - т/б “Глобус”</span> ' + first,
+  );
+  for (const [page, expected] of [
+    [declared, 'с. Ясіня – г. Петрос'],
+    [camp, 'Ясиня - г.Петрос - т/б “Глобус”'],
+  ]) {
+    const root = tempRoot(t);
+    const { results } = await runImport(withUrls([URL_37933]), { root, fetcher: fakeFetcher({ [URL_37933]: page }) });
+    assert.equal(readEntry(root, results[0].slug).data.route, expected);
+  }
+});
+
 test('нитка маршруту: якщо на сторінці немає span.route — з колонки «опис» таблиці /trip_search', async (t) => {
   const root = tempRoot(t);
   const noRoute = REPORT.replace(/<span class="route">([\s\S]*?)<\/span>/, '$1');
@@ -182,6 +204,8 @@ test('колонка «опис» /trip_search — нитка, лише якщо
   assert.equal(routeFromListText('Звіт про похід по Норвегії. Маршрут: Turtargø — Nedre Liagrø — Liaflui'), 'Turtargø — Nedre Liagrø — Liaflui');
   assert.equal(routeFromListText('Skj˚ak — Risheim — Lom\\ Керівник Сараєва Н.'), 'Skj˚ak — Risheim — Lom');
   assert.equal(routeFromListText('Сходження на пік Леніна'), null);
+  assert.equal(routeFromListText('Київ – Львів'), null, 'один роздільник — ще не нитка');
+  assert.equal(routeFromListText('Київ – Львів – Ворохта'), 'Київ – Львів – Ворохта');
   assert.equal(routeFromListText('Опубліковано звіт про похід по Західному Кокшал-Тоо за маршрутом:'), null);
 });
 

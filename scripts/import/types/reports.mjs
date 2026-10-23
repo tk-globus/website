@@ -114,9 +114,55 @@ export function routeFromListText(text) {
   return (route.match(/\s[–—-]\s/g) ?? []).length >= 2 ? route : null;
 }
 
-/** Нитка маршруту з тіла сторінки: текст усіх `span.route` підряд (без роздільника), пробіли нормалізовано. */
+const SEPARATOR_AT_END = /[–—-]\s*$/;
+const SEPARATOR_AT_START = /^\s*[–—-]/;
+
+/**
+ * Нитка маршруту з тіла сторінки. Старий сайт позначає `span.route` і шматки однієї нитки (поділ буває
+ * посеред слова: «(чер|ез»), і різні нитки на одній сторінці («Подробная / Заявленная / Пройденная»,
+ * «Планируемый / Реально пройденный», кілька походів табору). Тому сусідні span склеюються в одну нитку,
+ * лише якщо між ними в документі:
+ *   - немає тексту (зокрема межа абзацу) — без роздільника;
+ *   - лише пробіл, а на стику тире-роздільник («… –» + «Кваси …») — через пробіл.
+ * Будь-який інший текст («2.3.1. Заявленная нитка:») або пробіл без тире — початок нової нитки.
+ * Повертає першу нитку; пробіли нормалізовано.
+ */
 export function routeFromBody($, body) {
-  return cleanText(body.find('.route').map((_, el) => $(el).text()).get().join('')) || undefined;
+  const routes = [];
+  let current = null; // span.route, у якому був попередній текст
+  let gap = ''; // текст між попереднім span.route і цим
+  const routeOf = (node) => {
+    for (let el = node.parent; el && el !== body[0]; el = el.parent) {
+      if ($(el).hasClass('route')) return el;
+    }
+    return null;
+  };
+  const walk = (node) => {
+    for (const child of node.children ?? []) {
+      if (child.type !== 'text') {
+        walk(child);
+        continue;
+      }
+      const span = routeOf(child);
+      if (!span) {
+        if (current) gap += child.data;
+        continue;
+      }
+      if (span !== current && current) {
+        const last = routes[routes.length - 1];
+        const blank = !gap.replace(/[\s\u00a0]/g, '');
+        if (!gap) routes[routes.length - 1] = last + child.data;
+        else if (blank && (SEPARATOR_AT_END.test(last) || SEPARATOR_AT_START.test(child.data))) {
+          routes[routes.length - 1] = `${last} ${child.data}`;
+        } else routes.push(child.data);
+      } else if (!current) routes.push(child.data);
+      else routes[routes.length - 1] += child.data;
+      current = span;
+      gap = '';
+    }
+  };
+  walk(body[0]);
+  return cleanText(routes[0] ?? '') || undefined;
 }
 
 /** Таблиця пошуку бібліотеки `/trip_search`: адреси звітів і наступна сторінка (або null). */
