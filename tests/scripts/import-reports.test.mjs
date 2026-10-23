@@ -187,6 +187,19 @@ test('кілька різних ниток на сторінці (заявлен
   }
 });
 
+test('<br> усередині span.route — пробіл, слова не злипаються', async (t) => {
+  const root = tempRoot(t);
+  // Як на старому сайті (node/22200): «переезд на<br />Нижний Чулышман».
+  const page = REPORT.replace(
+    '<span class="route">Вдсп. Шипот – хр. Полонина Боржава – хр. Палений',
+    '<span class="route">Вдсп. Шипот – хр. Полонина<br />Боржава –<br/>хр. Палений',
+  );
+  const body = page.slice(page.indexOf('<article'));
+  assert.ok(body.includes('Полонина<br />Боржава'), 'розрив усередині span.route у тілі');
+  const { results } = await runImport(withUrls([URL_37933]), { root, fetcher: fakeFetcher({ [URL_37933]: page }) });
+  assert.match(readEntry(root, results[0].slug).data.route, /^Вдсп\. Шипот – хр\. Полонина Боржава – хр\. Палений Грунь – /);
+});
+
 test('нитка маршруту: якщо на сторінці немає span.route — з колонки «опис» таблиці /trip_search', async (t) => {
   const root = tempRoot(t);
   const noRoute = REPORT.replace(/<span class="route">([\s\S]*?)<\/span>/, '$1');

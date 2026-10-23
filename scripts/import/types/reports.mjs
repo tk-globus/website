@@ -139,24 +139,27 @@ export function routeFromBody($, body) {
   };
   const walk = (node) => {
     for (const child of node.children ?? []) {
-      if (child.type !== 'text') {
+      // `<br>` усередині span.route — це пробіл («переезд на<br>Нижний» → «переезд на Нижний»).
+      const isBreak = child.type === 'tag' && child.name === 'br' && routeOf(child);
+      if (child.type !== 'text' && !isBreak) {
         walk(child);
         continue;
       }
+      const text = isBreak ? ' ' : child.data;
       const span = routeOf(child);
       if (!span) {
-        if (current) gap += child.data;
+        if (current) gap += text;
         continue;
       }
       if (span !== current && current) {
         const last = routes[routes.length - 1];
         const blank = !gap.replace(/[\s\u00a0]/g, '');
-        if (!gap) routes[routes.length - 1] = last + child.data;
-        else if (blank && (SEPARATOR_AT_END.test(last) || SEPARATOR_AT_START.test(child.data))) {
-          routes[routes.length - 1] = `${last} ${child.data}`;
-        } else routes.push(child.data);
-      } else if (!current) routes.push(child.data);
-      else routes[routes.length - 1] += child.data;
+        if (!gap) routes[routes.length - 1] = last + text;
+        else if (blank && (SEPARATOR_AT_END.test(last) || SEPARATOR_AT_START.test(text))) {
+          routes[routes.length - 1] = `${last} ${text}`;
+        } else routes.push(text);
+      } else if (!current) routes.push(text);
+      else routes[routes.length - 1] += text;
       current = span;
       gap = '';
     }
