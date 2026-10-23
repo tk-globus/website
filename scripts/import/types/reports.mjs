@@ -1,7 +1,9 @@
 // Парсер «Звіт про похід» (вузол Drupal `story` з таксономіями). Список звітів — таблиця пошуку бібліотеки
 // `/trip_search` (тип `story` буває й не звітом, напр. табір), деталі — зі сторінки звіту:
 // поля `.field-name-taxonomy-vocabulary-*` (див. planning/research/old-site-audit.md), нитка маршруту —
-// `span.route` у тілі, файли — `.field-name-field-attachment` (розмір — з `type="…; length=<байти>"`).
+// усі `span.route` у тілі (старий сайт ділить її на кілька span, іноді посеред слова), а якщо їх немає —
+// колонка «опис» таблиці `/trip_search` (у вибірці вона збережена як `route`); файли —
+// `.field-name-field-attachment` (розмір — з `type="…; length=<байти>"`).
 //
 // Значення старого сайту нормалізуються до переліків схеми (src/lib/schemas/report.ts). Що не вдалося
 // розпізнати, не губиться мовчки: воно йде в `unrecognized` і у звіт імпорту.
@@ -94,14 +96,41 @@ export function normalizeAuthor(value) {
   return v;
 }
 
+/**
+ * Нитка маршруту з колонки «опис» таблиці `/trip_search`: адреса звіту → текст. Запасне джерело для звітів,
+ * де на сторінці немає `span.route`. Заповнюють sampleUrls (з вибірки) і parseTripSearch (з таблиці).
+ */
+const listRoutes = new Map();
+
+/**
+ * Текст колонки «опис» — нитка маршруту, лише якщо схожий на неї: щонайменше три пункти через « – ».
+ * Вступ («Звіт про … Маршрут:») і хвіст «Керівник …» відрізаємо.
+ * Не схожий на нитку текст (напр. «Сходження на пік Леніна») — null.
+ */
+export function routeFromListText(text) {
+  const route = cleanText(text)
+    .replace(/^[\s\S]*маршрут(?:ом)?\s*:\s*/i, '')
+    .replace(/[\s\\.]*Керівник[\s\S]*$/, '');
+  return (route.match(/\s[–—-]\s/g) ?? []).length >= 2 ? route : null;
+}
+
+/** Нитка маршруту з тіла сторінки: текст усіх `span.route` підряд (без роздільника), пробіли нормалізовано. */
+export function routeFromBody($, body) {
+  return cleanText(body.find('.route').map((_, el) => $(el).text()).get().join('')) || undefined;
+}
+
 /** Таблиця пошуку бібліотеки `/trip_search`: адреси звітів і наступна сторінка (або null). */
 export function parseTripSearch(html) {
   const $ = load(html);
-  const urls = $('table.views-table tbody td.views-field-title a')
-    .map((_, a) => $(a).attr('href'))
-    .get()
-    .filter(Boolean)
-    .map((href) => absoluteUrl(href));
+  const urls = [];
+  for (const row of $('table.views-table tbody tr').get()) {
+    const href = $(row).find('td.views-field-title a').attr('href');
+    if (!href) continue;
+    const url = absoluteUrl(href);
+    urls.push(url);
+    const route = routeFromListText($(row).find('td.views-field-body').text());
+    if (route) listRoutes.set(url, route);
+  }
   const nextHref = $('.pager .pager-next a').attr('href');
   return { urls, next: nextHref ? absoluteUrl(nextHref) : null };
 }
@@ -114,7 +143,12 @@ export default {
 
   /** Вибірка для прототипу: 44 звіти з аудиту (planning/research/data/reports-sample.json). */
   sampleUrls() {
-    return JSON.parse(readFileSync(sampleFile, 'utf8')).map((item) => absoluteUrl(item.url));
+    return JSON.parse(readFileSync(sampleFile, 'utf8')).map((item) => {
+      const url = absoluteUrl(item.url);
+      const route = routeFromListText(item.route ?? '');
+      if (route) listRoutes.set(url, route);
+      return url;
+    });
   },
 
   /** «Усе»: пошук бібліотеки старого сайту, 14 сторінок по 50 звітів. */
@@ -190,7 +224,7 @@ export default {
     if (!files.length) warnings.push('без файлів (немає вкладень на сторінці)');
 
     const body = article.find('.field-name-body .field-item').first();
-    const route = cleanText(body.find('.route').first().text()) || undefined;
+    const route = routeFromBody($, body) ?? listRoutes.get(pageUrl);
     unwrapAnchorLinks($, body);
     flattenLayoutTables($, body);
     const images = prepareBody($, body);

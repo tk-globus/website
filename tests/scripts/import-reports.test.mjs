@@ -10,6 +10,7 @@ import { z } from 'astro/zod';
 import { REPORT_REGIONS, reportSchema } from '../../src/lib/schemas/report.ts';
 import { readFrontmatter, runImport, summarizeUnrecognized } from '../../scripts/import/core.mjs';
 import reports, {
+  routeFromListText,
   normalizeAuthor,
   normalizeGrade,
   normalizeKind,
@@ -149,6 +150,39 @@ test('старий HTML-звіт: галерея-таблиця → фото в 
   assert.match(body, /<img src="https:\/\/www\.tkg\.org\.ua\/files\/images\/member\.jpg" alt="Учасник">/);
   assert.ok(!fetcher.asked.includes('https://www.tkg.org.ua/files/images/member.jpg'), 'фото з сирого HTML не завантажується');
   assert.ok(fetcher.asked.includes('https://www.tkg.org.ua/files/images/g_01.thumbnail.jpg'));
+});
+
+test('нитка маршруту, поділена на кілька span.route (іноді посеред слова), склеюється повністю', async (t) => {
+  const root = tempRoot(t);
+  // Як на старому сайті (напр. node/35539): «… (чер</span><span class="route">ез …».
+  const split = REPORT.replace(
+    '<span class="route">Вдсп. Шипот – хр. Полонина Боржава – хр. Палений Грунь',
+    '<span class="route">Вдсп. Шипот – хр. Полонина Бор</span><span class="route">жава – хр. Палений Грунь</span> <span class="route"> ',
+  );
+  assert.equal((split.match(/class="route"/g) ?? []).length, 3, 'у фікстурі три span.route');
+  const { results } = await runImport(withUrls([URL_37933]), { root, fetcher: fakeFetcher({ [URL_37933]: split }) });
+  const { data } = readEntry(root, results[0].slug);
+  assert.match(data.route, /^Вдсп\. Шипот – хр\. Полонина Боржава – хр\. Палений Грунь – р\. Ріка – .* – Буковель \(с\.Паляниця\)$/);
+});
+
+test('нитка маршруту: якщо на сторінці немає span.route — з колонки «опис» таблиці /trip_search', async (t) => {
+  const root = tempRoot(t);
+  const noRoute = REPORT.replace(/<span class="route">([\s\S]*?)<\/span>/, '$1');
+  assert.ok(!noRoute.includes('class="route"'));
+  // Таблиця /trip_search (фікстура) заповнює запасні нитки для своїх адрес.
+  const { urls } = reports.parseList(fixture('list-trip-search--page0.html'));
+  assert.ok(urls.includes(URL_37933));
+  const { results } = await runImport(withUrls([URL_37933]), { root, fetcher: fakeFetcher({ [URL_37933]: noRoute }) });
+  const { data } = readEntry(root, results[0].slug);
+  assert.match(data.route, /^Вдсп\. Шипот – хр\. Полонина Боржава – .* – Буковель \(с\.Паляниця\)$/);
+});
+
+test('колонка «опис» /trip_search — нитка, лише якщо схожа на маршрут', () => {
+  assert.equal(routeFromListText('ст. Баликсу - р. Теренсу - п. Геологов (н/к)'), 'ст. Баликсу - р. Теренсу - п. Геологов (н/к)');
+  assert.equal(routeFromListText('Звіт про похід по Норвегії. Маршрут: Turtargø — Nedre Liagrø — Liaflui'), 'Turtargø — Nedre Liagrø — Liaflui');
+  assert.equal(routeFromListText('Skj˚ak — Risheim — Lom\\ Керівник Сараєва Н.'), 'Skj˚ak — Risheim — Lom');
+  assert.equal(routeFromListText('Сходження на пік Леніна'), null);
+  assert.equal(routeFromListText('Опубліковано звіт про похід по Західному Кокшал-Тоо за маршрутом:'), null);
 });
 
 test('переліки старого сайту: вид, к.с., район, рік, тип матеріалу, автор', () => {

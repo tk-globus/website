@@ -5,6 +5,7 @@ grade: "2"
 regions:
   - Скандинавські гори
 year: 2016
+route: Turtargø — Nedre Liagrø — Liaflui (1768) — Nørdstedalseter — Fivlemyrane — Sottjønnin — Sota Sæter — Framrusti — Pollfoss — Nysætre — Vulu — Grønnvassbue — Veltdalshytta — Langvassl˚ag˚an — Sveinbui — Aursjoen — Skj˚ak — Risheim — Lom
 countries:
   - Норвегія
 season: літо
