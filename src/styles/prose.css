@@ -6,6 +6,8 @@
 @layer components {
   .prose {
     max-width: var(--container-text);
+    /* Довгі адреси без пробілів (посилання в старих звітах) переносяться, а не розсувають сторінку. */
+    overflow-wrap: anywhere;
     font-size: var(--text-base);
     line-height: var(--text-base--line-height);
   }
@@ -73,7 +75,11 @@
     border-color: var(--color-line);
   }
 
+  /* Широкі таблиці (нитка по днях у старих звітах) прокручуються самі, а не розсувають сторінку. */
   .prose table {
+    display: block;
+    max-width: 100%;
+    overflow-x: auto;
     width: 100%;
     font-size: var(--text-sm);
     border-collapse: collapse;

@@ -1,0 +1,48 @@
+---
+// Бібліотека звітів про походи: картки від найсвіжіших до найстаріших. Фільтри (район, вид, к.с., рік) — тікет 08.
+import BaseLayout from '../../layouts/BaseLayout.astro';
+import PageHeader from '../../components/PageHeader.astro';
+import Section from '../../components/Section.astro';
+import CardGrid from '../../components/CardGrid.astro';
+import ReportCard from '../../components/ReportCard.astro';
+import EmptyState from '../../components/EmptyState.astro';
+import { getReports, reportHref, reportsCount } from '../../lib/reports';
+
+const reports = await getReports();
+---
+
+<BaseLayout
+  title="Бібліотека звітів"
+  description="Звіти учасників турклубу «Глобус» про походи: Карпати, Кавказ, Крим, Тянь-Шань, Памір — з нитками маршрутів, фото й PDF."
+>
+  <PageHeader
+    title="Бібліотека звітів"
+    lead={`Звіти учасників клубу про походи: райони, види туризму, категорії складності й нитки маршрутів. У прототипі — вибірка: ${reportsCount(reports.length)} зі старого сайту.`}
+    breadcrumbs={[{ label: 'Бібліотека' }]}
+  />
+  <Section>
+    {
+      reports.length ? (
+        <CardGrid columns={3}>
+          {reports.map((entry) => (
+            <ReportCard
+              headingLevel={2}
+              title={entry.data.title}
+              href={reportHref(entry)}
+              kind={entry.data.kind}
+              grade={entry.data.grade}
+              regions={entry.data.regions}
+              year={entry.data.year}
+              authors={entry.data.authors}
+              route={entry.data.route}
+              image={entry.data.cover}
+              imageAlt={entry.data.coverAlt}
+            />
+          ))}
+        </CardGrid>
+      ) : (
+        <EmptyState headingLevel={2} title="Звітів поки немає" />
+      )
+    }
+  </Section>
+</BaseLayout>

@@ -1,0 +1,28 @@
+---
+// Список «назва — значення» (метадані звіту, події): район, к.с., рік, нитка маршруту…
+// Порожні значення пропускаються. wide — значення на всю ширину (довгий текст: нитка маршруту).
+export interface Fact {
+  label: string;
+  value?: string | number | (string | number)[];
+  wide?: boolean;
+}
+
+interface Props {
+  items: Fact[];
+}
+
+const facts = Astro.props.items
+  .map((fact) => ({ ...fact, text: [fact.value ?? []].flat().filter((v) => v !== '').join(', ') }))
+  .filter((fact) => fact.text);
+---
+
+<dl data-component="Facts" class="grid max-w-text gap-x-6 gap-y-4 sm:grid-cols-2">
+  {
+    facts.map((fact) => (
+      <div class:list={[fact.wide && 'sm:col-span-2']}>
+        <dt class="text-sm text-muted">{fact.label}</dt>
+        <dd class="mt-1 text-ink">{fact.text}</dd>
+      </div>
+    ))
+  }
+</dl>

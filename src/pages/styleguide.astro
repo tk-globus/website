@@ -10,9 +10,11 @@ import Channels from '../components/Channels.astro';
 import CardGrid from '../components/CardGrid.astro';
 import Cluster from '../components/Cluster.astro';
 import EmptyState from '../components/EmptyState.astro';
+import Facts from '../components/Facts.astro';
 import Hero from '../components/Hero.astro';
 import PageHeader from '../components/PageHeader.astro';
 import Prose from '../components/Prose.astro';
+import ReportCard from '../components/ReportCard.astro';
 import Section from '../components/Section.astro';
 import Tag from '../components/Tag.astro';
 import ColorTokens from '../components/styleguide/ColorTokens.astro';
@@ -139,17 +141,33 @@ const activities: Activity[] = [
         <Fragment slot="meta"><Tag tone="accent">майбутня</Tag> 15–16 листопада 2026</Fragment>
         <Fragment slot="footer">Київська обл.</Fragment>
       </Card>
-      <Card
+      <ReportCard
         href="/styleguide"
         image={petros}
         imageAlt="Група на вершині Петроса"
         title="Пішохідний похід 2 к.с. Чорногорою"
-        description="Ворохта — Говерла — Петрос — Кваси."
-      >
-        <Fragment slot="meta"><Tag>Карпати</Tag><Tag>пішохідний</Tag><Tag tone="accent">2 к.с.</Tag></Fragment>
-        <Fragment slot="footer">2024 · керівник: І. Прізвище</Fragment>
-      </Card>
+        route="Ворохта — Говерла — Петрос — Кваси."
+        regions={['Карпати']}
+        kind="пішохідний"
+        grade="2"
+        year={2024}
+        authors={['Ім’я Прізвище']}
+      />
     </CardGrid>
+    <Specimen
+      title="Картка звіту і метадані"
+      usage={'<ReportCard title kind grade regions year authors route /> · <Facts items={[{ label, value, wide }]} />'}
+    >
+      <Facts
+        items={[
+          { label: 'Район', value: 'Карпати' },
+          { label: 'Вид туризму', value: 'пішохідний' },
+          { label: 'Категорія складності', value: '2 к.с.' },
+          { label: 'Рік', value: 2024 },
+          { label: 'Нитка маршруту', value: 'Ворохта — Говерла — Петрос — Кваси', wide: true },
+        ]}
+      />
+    </Specimen>
   </Section>
 
   <Section id="activities" tone="surface" title="Напрями діяльності" intro="Блок для головної: чим займається клуб.">

@@ -13,6 +13,9 @@
 //       data      — поля frontmatter (без обкладинки), мають пройти схему колекції
 //       cover     — { src, alt } оригіналу на старому сайті або null
 //       bodyHtml  — HTML тіла з абсолютними адресами (ядро завантажить фото й перетворить на Markdown)
+//       unrecognized — (необовʼязково) [{ field, value }]: значення, яких немає в переліках схеми, — у звіт імпорту
+//       warnings  — (необовʼязково) інші попередження про запис
 import news from './news.mjs';
+import reports from './reports.mjs';
 
-export const types = { news };
+export const types = { news, reports };

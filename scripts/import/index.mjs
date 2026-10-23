@@ -6,12 +6,13 @@
 //   npm run import -- news --scope all      усі новини зі сторінок архіву старого сайту
 //   npm run import -- news --limit 3        лише перші 3 записи
 //   npm run import -- news --refresh        завантажити сторінки заново, а не з кешу
+//   npm run import -- reports               звіти: вибірка з аудиту; --scope all — уся бібліотека (/trip_search)
 //
 // Кеш сторінок і фото — .cache/old-site/ (у .gitignore). Між запитами в мережу — пауза 1,5–2 с.
 import { parseArgs } from 'node:util';
 import { resolve } from 'node:path';
 import { createFetcher } from './fetcher.mjs';
-import { runImport } from './core.mjs';
+import { runImport, summarizeUnrecognized } from './core.mjs';
 import { types } from './types/index.mjs';
 
 const { values, positionals } = parseArgs({
@@ -50,4 +51,9 @@ console.log(
     `помилок ${failed.length}. Запитів у мережу: ${fetcher.requests}.`,
 );
 for (const w of warnings) console.log(`! ${w}`);
+const unrecognized = summarizeUnrecognized(results);
+if (unrecognized.length) {
+  console.log(`\nНе вдалося нормалізувати (значення пропущено, решту запису імпортовано): ${unrecognized.length}`);
+  for (const { field, value, slugs } of unrecognized) console.log(`  ? ${field} «${value}» — ${slugs.join(', ')}`);
+}
 if (failed.length) process.exit(1);

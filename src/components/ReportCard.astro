@@ -1,0 +1,37 @@
+---
+// Картка звіту про похід (на основі Card): фото, мітки району, виду й к.с., нитка маршруту, рік і автор.
+// Бібліотека (/library) і блок на головній. Дані — поля колекції reports (src/lib/schemas/report.ts).
+import type { ImageMetadata } from 'astro';
+import Card from './Card.astro';
+import Tag from './Tag.astro';
+import { gradeLabel } from '../lib/reports';
+import type { ReportGrade } from '../lib/schemas/report';
+
+interface Props {
+  title: string;
+  href: string;
+  kind: string;
+  grade?: ReportGrade;
+  regions?: string[];
+  year?: number;
+  authors?: string[];
+  route?: string;
+  image?: ImageMetadata;
+  imageAlt?: string;
+  headingLevel?: 2 | 3;
+}
+
+const { title, href, kind, grade, regions = [], year, authors = [], route, image, imageAlt, headingLevel } = Astro.props;
+const footer = [year, authors.join(', ')].filter(Boolean).join(' · ');
+---
+
+<div data-component="ReportCard" class="grid">
+  <Card title={title} href={href} description={route} image={image} imageAlt={imageAlt} headingLevel={headingLevel}>
+    <Fragment slot="meta">
+      {regions.map((region) => <Tag>{region}</Tag>)}
+      <Tag>{kind}</Tag>
+      {grade && <Tag tone="accent">{gradeLabel(grade)}</Tag>}
+    </Fragment>
+    {footer && <Fragment slot="footer">{footer}</Fragment>}
+  </Card>
+</div>
