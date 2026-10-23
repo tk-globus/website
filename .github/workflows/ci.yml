@@ -37,8 +37,10 @@ jobs:
       - name: Внутрішні посилання
         run: npm run check:links
 
+      # Без --with-deps: системні бібліотеки для Chromium уже є на ubuntu-latest,
+      # а apt-дзеркала бувають дуже повільні (встановлення шрифтів тягнулося 10+ хв).
       - name: Встановити браузер для смоук-тестів
-        run: npx playwright install --with-deps chromium
+        run: npx playwright install --only-shell chromium
 
       - name: Смоук-тести
         run: npm run test:smoke
