@@ -146,6 +146,15 @@ test('календар: кожна подія стоїть на своїх да�
   const october = page.locator('[data-month="2026-10"]');
   await expect(october).toBeVisible();
   await expect(october.locator(`td[data-date="2026-10-25"] a[href="${autumn.path}"]`)).toBeVisible();
+
+  // Тиждень — з понеділка: 25.10.2026 (неділя) стоїть у стовпчику «Нд», 1.10.2026 (четвер) — у «Чт».
+  const headers = await october.locator('thead th').allInnerTexts();
+  expect(headers).toEqual(['Пн', 'Вт', 'Ср', 'Чт', 'Пт', 'Сб', 'Нд']);
+  const column = (date: string) =>
+    october.locator(`td[data-date="${date}"]`).evaluate((td: HTMLTableCellElement) => td.cellIndex);
+  expect(headers[await column('2026-10-25')]).toBe('Нд');
+  expect(headers[await column('2026-10-01')]).toBe('Чт');
+  expect(headers[await column('2026-10-26')]).toBe('Пн');
 });
 
 test('на телефоні календар показує список подій місяця', async ({ page }) => {
