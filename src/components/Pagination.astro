@@ -1,0 +1,73 @@
+---
+// Пагінація стрічки: «Попередня», номери сторінок, «Наступна». Поточна сторінка — без посилання
+// (aria-current="page"). Адреси сторінок — pageHref() з src/lib/pagination.ts (`/news`, `/news/2`…).
+// Одна сторінка — пагінації немає (компонент нічого не показує).
+import Icon from './Icon.astro';
+import { pageHref } from '../lib/pagination';
+
+interface Props {
+  /** Адреса першої сторінки стрічки (`/news`). */
+  base: string;
+  current: number;
+  total: number;
+  /** Підпис для скрінрідерів: «Сторінки новин». */
+  label?: string;
+  /** Інші адреси сторінок (зразок на /styleguide веде на саму /styleguide). */
+  href?: (n: number) => string;
+}
+
+const { base, current, total, label = 'Сторінки', href = (n: number) => pageHref(base, n) } = Astro.props;
+const pages = Array.from({ length: total }, (_, i) => i + 1);
+
+const step = 'inline-flex min-w-10 items-center justify-center gap-1 rounded-md border border-line/soft px-3 py-2 text-sm font-semibold';
+const link = `${step} bg-paper text-brand transition-colors hover:bg-brand-soft`;
+const inactive = `${step} text-muted opacity-disabled`;
+---
+
+{
+  total > 1 && (
+    <nav data-component="Pagination" aria-label={label} class="mt-10">
+      <ul class="flex flex-wrap items-center justify-center gap-2">
+        <li>
+          {current > 1 ? (
+            <a class={link} href={href(current - 1)} rel="prev">
+              <Icon name="chevron-left" size={16} />
+              Попередня
+            </a>
+          ) : (
+            <span class={inactive} aria-disabled="true">
+              <Icon name="chevron-left" size={16} />
+              Попередня
+            </span>
+          )}
+        </li>
+        {pages.map((n) => (
+          <li>
+            {n === current ? (
+              <span class={`${step} border-brand bg-brand text-on-brand`} aria-current="page">
+                {n}
+              </span>
+            ) : (
+              <a class={link} href={href(n)} aria-label={`Сторінка ${n}`}>
+                {n}
+              </a>
+            )}
+          </li>
+        ))}
+        <li>
+          {current < total ? (
+            <a class={link} href={href(current + 1)} rel="next">
+              Наступна
+              <Icon name="chevron-right" size={16} />
+            </a>
+          ) : (
+            <span class={inactive} aria-disabled="true">
+              Наступна
+              <Icon name="chevron-right" size={16} />
+            </span>
+          )}
+        </li>
+      </ul>
+    </nav>
+  )
+}

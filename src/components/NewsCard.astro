@@ -1,0 +1,25 @@
+---
+// Картка новини (на основі Card): обкладинка (або заглушка з кольорів теми), дата, заголовок, короткий опис.
+// Стрічка /news і блок «Останні новини» на головній. Дані — поля колекції news (src/lib/schemas/news.ts).
+import type { ImageMetadata } from 'astro';
+import Card from './Card.astro';
+import { formatDate, isoDate } from '../lib/dates';
+
+interface Props {
+  title: string;
+  href: string;
+  date: Date;
+  description?: string;
+  image?: ImageMetadata;
+  imageAlt?: string;
+  headingLevel?: 2 | 3;
+}
+
+const { title, href, date, description, image, imageAlt, headingLevel } = Astro.props;
+---
+
+<div data-component="NewsCard" class="grid">
+  <Card title={title} href={href} description={description} image={image} imageAlt={imageAlt} headingLevel={headingLevel} placeholder>
+    <time slot="meta" datetime={isoDate(date)}>{formatDate(date)}</time>
+  </Card>
+</div>
