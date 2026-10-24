@@ -100,7 +100,19 @@ for (const { route, title, date, cover, legacyUrl } of news) {
   });
 }
 
-for (const { route, title, cover } of news.filter((n) => n.cover).slice(0, 2)) {
+/** Ширина й висота JPEG — з заголовка кадру (маркер SOF0…SOF15, крім DHT/JPG/DAC). */
+function jpegSize(jpeg: Buffer): [number, number] {
+  for (let i = 2; i < jpeg.length; ) {
+    const marker = jpeg[i + 1];
+    if (marker >= 0xc0 && marker <= 0xcf && ![0xc4, 0xc8, 0xcc].includes(marker)) {
+      return [jpeg.readUInt16BE(i + 7), jpeg.readUInt16BE(i + 5)];
+    }
+    i += 2 + jpeg.readUInt16BE(i + 2);
+  }
+  throw new Error('не знайшов розмір JPEG');
+}
+
+for (const { route, title, cover } of news.filter((n) => n.cover)) {
   test(`${route}: превʼю для месенджерів — заголовок, опис і обкладинка`, async ({ page, request }) => {
     await page.goto(route);
     const meta = (selector: string) => page.locator(`head meta[${selector}]`);
@@ -113,6 +125,11 @@ for (const { route, title, cover } of news.filter((n) => n.cover).slice(0, 2)) {
     const response = await request.get(new URL(image).pathname);
     expect(response.status()).toBe(200);
     expect(response.headers()['content-type']).toContain('image/jpeg');
+
+    // Пропорція великої картки месенджерів — 1200×630 (≈1,905), навіть якщо фото менше.
+    const [width, height] = jpegSize(await response.body());
+    expect(width, 'не ширше за 1200').toBeLessThanOrEqual(1200);
+    expect(Math.abs(width / height - 1200 / 630), `пропорція ${width}×${height}`).toBeLessThan(0.01);
   });
 }
 

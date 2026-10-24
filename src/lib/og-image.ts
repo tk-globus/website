@@ -13,10 +13,15 @@ export const OG_IMAGE = {
 };
 
 /**
- * Превʼю посилання з фото запису (обкладинка новини): JPEG 1200×630, обрізаний по центру.
- * Повертає адресу на сайті для BaseLayout (`image`); фото меншого розміру не розтягується.
+ * Превʼю посилання з фото запису (обкладинка новини): JPEG із пропорцією 1200×630 (≈1,905), обрізаний
+ * по центру. Мале фото не розтягується: картинка менша за 1200×630, але пропорція та сама.
+ * Повертає адресу на сайті для BaseLayout (`image`).
  */
 export async function ogImageFrom(photo: ImageMetadata): Promise<string> {
-  const { src } = await getImage({ src: photo, width: OG_IMAGE.width, height: OG_IMAGE.height, fit: 'cover', format: 'jpg' });
+  const ratio = OG_IMAGE.width / OG_IMAGE.height;
+  // Широке низьке фото обмежує ширину своєю висотою — інакше висоту довелося б розтягувати.
+  const width = Math.min(OG_IMAGE.width, photo.width, Math.floor(photo.height * ratio));
+  const height = Math.round(width / ratio);
+  const { src } = await getImage({ src: photo, width, height, fit: 'cover', format: 'jpg' });
   return src;
 }
