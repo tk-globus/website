@@ -31,8 +31,9 @@ const title = first ? 'Новини' : `Новини — сторінка ${page
     {
       page.data.length ? (
         <CardGrid columns={3}>
-          {page.data.map((entry) => (
+          {page.data.map((entry, i) => (
             <NewsCard
+              priority={i === 0}
               title={entry.data.title}
               href={newsHref(entry)}
               date={entry.data.date}

@@ -13,13 +13,15 @@ interface Props {
   image?: ImageMetadata;
   imageAlt?: string;
   headingLevel?: 2 | 3;
+  /** Перша картка стрічки — фото вантажиться одразу (Card priority). */
+  priority?: boolean;
 }
 
-const { title, href, date, description, image, imageAlt, headingLevel } = Astro.props;
+const { title, href, date, description, image, imageAlt, headingLevel, priority } = Astro.props;
 ---
 
 <div data-component="NewsCard" class="grid">
-  <Card title={title} href={href} description={description} image={image} imageAlt={imageAlt} headingLevel={headingLevel} placeholder>
+  <Card title={title} href={href} description={description} image={image} imageAlt={imageAlt} headingLevel={headingLevel} priority={priority} placeholder>
     <time slot="meta" datetime={isoDate(date)}>{formatDate(date)}</time>
   </Card>
 </div>
