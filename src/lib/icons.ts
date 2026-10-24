@@ -12,6 +12,7 @@ export const iconPaths = {
   'arrow-right': '<path d="M5 12h14M13 6l6 6-6 6"/>',
   'chevron-right': '<path d="m9 6 6 6-6 6"/>',
   'chevron-left': '<path d="m15 6-6 6 6 6"/>',
+  list: '<path d="M9 6.5h11M9 12h11M9 17.5h11"/><path d="M4.5 6.5h.01M4.5 12h.01M4.5 17.5h.01"/>',
   search: '<circle cx="11" cy="11" r="7"/><path d="m20 20-4-4"/>',
   compass: '<circle cx="12" cy="12" r="9"/><path d="m15.5 8.5-2 5-5 2 2-5z"/>',
   calendar: '<rect x="3.5" y="5" width="17" height="15.5" rx="2"/><path d="M3.5 10h17M8 3v4M16 3v4"/>',

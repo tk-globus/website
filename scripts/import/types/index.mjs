@@ -19,8 +19,10 @@
 //       bodyHtml  — HTML тіла з абсолютними адресами (ядро завантажить фото й перетворить на Markdown)
 //       unrecognized — (необовʼязково) [{ field, value }]: значення, яких немає в переліках схеми, — у звіт імпорту
 //       warnings  — (необовʼязково) інші попередження про запис
+//     або { skip: 'причина' } — запис свідомо пропускається (напр. порожня чернетка); у звіті — «- пропущено»
 import news from './news.mjs';
 import reports from './reports.mjs';
 import pages from './pages.mjs';
+import events from './events.mjs';
 
-export const types = { news, reports, pages };
+export const types = { news, events, reports, pages };

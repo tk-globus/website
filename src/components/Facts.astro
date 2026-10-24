@@ -5,6 +5,8 @@ export interface Fact {
   label: string;
   value?: string | number | (string | number)[];
   wide?: boolean;
+  /** Значення — дата чи час: показується в <time datetime="…"> (напр. `2026-10-25T08:00`). */
+  datetime?: string;
 }
 
 interface Props {
@@ -21,7 +23,7 @@ const facts = Astro.props.items
     facts.map((fact) => (
       <div class:list={[fact.wide && 'sm:col-span-2']}>
         <dt class="text-sm text-muted">{fact.label}</dt>
-        <dd class="mt-1 text-ink">{fact.text}</dd>
+        <dd class="mt-1 text-ink">{fact.datetime ? <time datetime={fact.datetime}>{fact.text}</time> : fact.text}</dd>
       </div>
     ))
   }

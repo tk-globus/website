@@ -1,0 +1,44 @@
+---
+// Картка події (на основі Card): дата й час, назва, місце; за потреби — обкладинка й короткий опис.
+// Сторінка /events і блок «Найближчі події» на головній. Дані — поля колекції events (src/lib/schemas/event.ts).
+import type { ImageMetadata } from 'astro';
+import Card from './Card.astro';
+import Icon from './Icon.astro';
+import { formatWhen } from '../lib/events';
+
+interface Props {
+  title: string;
+  href: string;
+  /** Початок і кінець: `2026-10-25T08:00` (київський час). */
+  start: string;
+  end?: string;
+  location?: string;
+  description?: string;
+  image?: ImageMetadata;
+  imageAlt?: string;
+  headingLevel?: 2 | 3;
+}
+
+const { title, href, start, end, location, description, image, imageAlt, headingLevel } = Astro.props;
+---
+
+<div data-component="EventCard" class="grid">
+  <Card title={title} href={href} description={description} image={image} imageAlt={imageAlt} headingLevel={headingLevel}>
+    <Fragment slot="meta">
+      <span class="flex items-start gap-2">
+        <Icon name="calendar" size={16} class="mt-0.5 shrink-0 text-brand" />
+        <time datetime={start}>{formatWhen(start, end)}</time>
+      </span>
+    </Fragment>
+    {
+      location && (
+        <Fragment slot="footer">
+          <span class="flex items-start gap-2 text-muted">
+            <Icon name="map-pin" size={16} class="mt-0.5 shrink-0 text-brand" />
+            {location}
+          </span>
+        </Fragment>
+      )
+    }
+  </Card>
+</div>

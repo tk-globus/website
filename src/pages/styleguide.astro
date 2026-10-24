@@ -11,6 +11,10 @@ import CardGrid from '../components/CardGrid.astro';
 import Cluster from '../components/Cluster.astro';
 import EmptyState from '../components/EmptyState.astro';
 import Facts from '../components/Facts.astro';
+import EventCard from '../components/EventCard.astro';
+import EventCalendar from '../components/EventCalendar.astro';
+import ViewSwitch from '../components/ViewSwitch.astro';
+import ViewPanel from '../components/ViewPanel.astro';
 import Hero from '../components/Hero.astro';
 import PageHeader from '../components/PageHeader.astro';
 import Prose from '../components/Prose.astro';
@@ -29,6 +33,7 @@ import Toc from '../components/styleguide/Toc.astro';
 import TypeTokens from '../components/styleguide/TypeTokens.astro';
 import petros from '../assets/styleguide/petros.jpg';
 import korostyshiv from '../assets/photos/korostyshiv-2026.jpg';
+import { calendarMonths } from '../lib/events';
 
 const sections = [
   { id: 'colors', label: 'Кольори' },
@@ -38,6 +43,7 @@ const sections = [
   { id: 'buttons', label: 'Кнопки' },
   { id: 'tags', label: 'Мітки й іконки' },
   { id: 'cards', label: 'Картки' },
+  { id: 'events', label: 'Події' },
   { id: 'activities', label: 'Напрями' },
   { id: 'channels', label: 'Канали' },
   { id: 'sections', label: 'Секції' },
@@ -46,6 +52,18 @@ const sections = [
   { id: 'empty', label: 'Порожній стан' },
   { id: 'prose', label: 'Текст' },
 ];
+
+// Приклад календаря подій: два місяці, подія на кілька днів і два записи в один день.
+const sampleMonths = calendarMonths(
+  [
+    { title: 'Лекція «Орієнтування»', href: '/styleguide', start: '2026-10-15T19:00', end: '2026-10-15T21:00' },
+    { title: '«Осінній лист 2026»', href: '/styleguide', start: '2026-10-25T08:00' },
+    { title: 'Навчальний виїзд Групи А', href: '/styleguide', start: '2026-11-07T07:00', end: '2026-11-08T19:00' },
+    { title: 'Клубний вечір', href: '/styleguide', start: '2026-11-25T19:00' },
+    { title: 'Тренування', href: '/styleguide', start: '2026-11-25T10:00' },
+  ],
+  '2026-10-24',
+);
 
 // Приклади — для показу компонента; справжні тексти напрямів — на головній (src/pages/index.astro).
 const activities: Activity[] = [
@@ -193,7 +211,50 @@ const activities: Activity[] = [
     </Specimen>
   </Section>
 
-  <Section id="activities" tone="surface" title="Напрями діяльності" intro="Блок для головної: чим займається клуб.">
+  <Section
+    id="events"
+    tone="surface"
+    title="Події"
+    intro="Картка події, перемикач «Список / Календар» і календар місяця. Перемикач і гортання місяців працюють зі скриптом."
+  >
+    <Specimen title="Картки подій" usage={'<EventCard title href start end location description image />'}>
+      <CardGrid>
+        <EventCard
+          href="/styleguide"
+          title="Відкрите змагальне тренування «Осінній лист 2026»"
+          start="2026-10-25T08:00"
+          location="Київ, Голосіївський парк"
+          description="Командні змагання зі спортивного туризму для всіх охочих."
+          image={korostyshiv}
+          imageAlt="Учасники клубу на виїзді в Коростишеві"
+        />
+        <EventCard href="/styleguide" title="Лекція «Гірські переправи»" start="2025-04-02T19:00" end="2025-04-02T21:00" location="Онлайн, Zoom" />
+        <EventCard href="/styleguide" title="Клубний виїзд у Дениші" start="2023-10-28T07:00" end="2023-10-29T19:00" />
+      </CardGrid>
+    </Specimen>
+    <Specimen
+      title="Перемикач вигляду й календар"
+      usage={'<ViewSwitch group views label /> · <ViewPanel group view active> · <EventCalendar months initial />'}
+    >
+      <ViewSwitch
+        group="styleguide-events"
+        param="sample-view"
+        label="Вигляд прикладу"
+        views={[
+          { id: 'calendar', label: 'Календар', icon: 'calendar' },
+          { id: 'list', label: 'Список', icon: 'list' },
+        ]}
+      />
+      <ViewPanel group="styleguide-events" view="calendar" active>
+        <EventCalendar months={sampleMonths} initial="2026-10" headingLevel={3} />
+      </ViewPanel>
+      <ViewPanel group="styleguide-events" view="list">
+        <Prose><p>Тут — список подій (на /events — картки найближчих і минулих).</p></Prose>
+      </ViewPanel>
+    </Specimen>
+  </Section>
+
+  <Section id="activities" title="Напрями діяльності" intro="Блок для головної: чим займається клуб.">
     <Activities items={activities} />
   </Section>
 

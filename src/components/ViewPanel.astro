@@ -1,0 +1,15 @@
+---
+// Панель одного вигляду для перемикача ViewSwitch (напр. «список» і «календар» подій).
+// active — панель, видима без JavaScript і за замовчуванням (перша кнопка перемикача).
+interface Props {
+  group: string;
+  view: string;
+  active?: boolean;
+}
+
+const { group, view, active = false } = Astro.props;
+---
+
+<div data-component="ViewPanel" data-view-group={group} data-view-panel={view} hidden={!active}>
+  <slot />
+</div>
