@@ -1,5 +1,6 @@
 ---
 // Окрема новина: заголовок, дата, обкладинка й текст. Посилання на оригінал — щоб звірити з tkg.org.ua.
+// Превʼю посилання в месенджерах — заголовок, опис і обкладинка (без обкладинки — /og.png з логотипом).
 import { Image } from 'astro:assets';
 import { render } from 'astro:content';
 import BaseLayout from '../../layouts/BaseLayout.astro';
@@ -8,6 +9,7 @@ import Section from '../../components/Section.astro';
 import Prose from '../../components/Prose.astro';
 import { getNews, type News } from '../../lib/news';
 import { formatDate, isoDate } from '../../lib/dates';
+import { ogImageFrom } from '../../lib/og-image';
 
 export async function getStaticPaths() {
   const news = await getNews();
@@ -17,10 +19,11 @@ export async function getStaticPaths() {
 const { entry } = Astro.props as { entry: News };
 const { title, date, cover, coverAlt, description, legacyUrl } = entry.data;
 const { Content } = await render(entry);
+const ogImage = cover ? await ogImageFrom(cover) : undefined;
 ---
 
-<BaseLayout title={title} description={description}>
-  <PageHeader title={title} breadcrumbs={[{ label: 'Новини', href: '/news' }, { label: title }]}>
+<BaseLayout title={title} description={description} image={ogImage} imageAlt={cover ? coverAlt || title : undefined}>
+  <PageHeader title={title} breadcrumbs={[{ label: 'Новини', href: '/news' }]}>
     <time datetime={isoDate(date)}>{formatDate(date)}</time>
   </PageHeader>
   <Section>

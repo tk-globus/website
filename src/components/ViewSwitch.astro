@@ -1,0 +1,76 @@
+---
+// Перемикач вигляду («Список / Календар»): кнопки показують одну з панелей ViewPanel тієї самої групи.
+// Вибір пишеться в адресу (`?view=calendar`), тож посилання відкриває той самий вигляд.
+// Без JavaScript перемикача не видно — показано першу панель (список).
+import Icon from './Icon.astro';
+import type { IconName } from '../lib/icons';
+
+export interface View {
+  id: string;
+  label: string;
+  icon?: IconName;
+}
+
+interface Props {
+  /** Назва групи: панелі ViewPanel з тим самим group перемикаються цими кнопками. */
+  group: string;
+  views: View[];
+  /** Підпис для скрінрідера: «Вигляд подій». */
+  label: string;
+  /** Параметр адреси, у якому зберігається вибір (перша панель — без параметра). */
+  param?: string;
+}
+
+const { group, views, label, param = 'view' } = Astro.props;
+---
+
+<div
+  data-component="ViewSwitch"
+  data-view-switch={group}
+  data-param={param}
+  role="group"
+  aria-label={label}
+  class="inline-flex flex-wrap gap-1 rounded-md border-thick border-brand bg-paper p-1"
+  hidden
+>
+  {
+    views.map((view, i) => (
+      <button
+        type="button"
+        data-view={view.id}
+        aria-pressed={i === 0 ? 'true' : 'false'}
+        class="inline-flex items-center gap-2 rounded-sm px-4 py-1.5 text-sm font-semibold text-brand transition-colors hover:bg-brand-soft aria-pressed:bg-brand aria-pressed:text-on-brand"
+      >
+        {view.icon && <Icon name={view.icon} size={18} class="shrink-0" />}
+        {view.label}
+      </button>
+    ))
+  }
+</div>
+
+<script>
+  // Показує панель обраного вигляду, ховає інші; вибір — у параметрі адреси (replaceState, без нової історії).
+  for (const root of document.querySelectorAll<HTMLElement>('[data-view-switch]')) {
+    const group = root.dataset.viewSwitch;
+    const param = root.dataset.param ?? 'view';
+    const buttons = [...root.querySelectorAll<HTMLButtonElement>('[data-view]')];
+    const panels = [...document.querySelectorAll<HTMLElement>(`[data-view-group="${group}"]`)];
+    const views = buttons.map((b) => b.dataset.view ?? '');
+
+    const show = (view: string, updateUrl: boolean) => {
+      for (const panel of panels) panel.hidden = panel.dataset.viewPanel !== view;
+      for (const button of buttons) button.setAttribute('aria-pressed', String(button.dataset.view === view));
+      if (updateUrl) {
+        const url = new URL(window.location.href);
+        if (view === views[0]) url.searchParams.delete(param);
+        else url.searchParams.set(param, view);
+        history.replaceState(history.state, '', url);
+      }
+    };
+
+    const fromUrl = new URL(window.location.href).searchParams.get(param);
+    show(fromUrl && views.includes(fromUrl) ? fromUrl : views[0], false);
+    root.hidden = false;
+    for (const button of buttons) button.addEventListener('click', () => show(button.dataset.view ?? views[0], true));
+  }
+</script>

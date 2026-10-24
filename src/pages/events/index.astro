@@ -1,0 +1,97 @@
+---
+// Події клубу: угорі майбутні (найближча першою), нижче минулі (найсвіжіша першою). Перемикач «Список /
+// Календар» показує ті самі події в календарі місяця. Майбутня чи минула — за датою під час збірки (lib/events.ts).
+import BaseLayout from '../../layouts/BaseLayout.astro';
+import PageHeader from '../../components/PageHeader.astro';
+import Section from '../../components/Section.astro';
+import CardGrid from '../../components/CardGrid.astro';
+import EventCard from '../../components/EventCard.astro';
+import EventCalendar from '../../components/EventCalendar.astro';
+import EmptyState from '../../components/EmptyState.astro';
+import Button from '../../components/Button.astro';
+import ViewSwitch from '../../components/ViewSwitch.astro';
+import ViewPanel from '../../components/ViewPanel.astro';
+import { calendarItem, calendarMonths, currentMonthKey, eventHref, getEvents, splitEvents, todayInKyiv } from '../../lib/events';
+import { settings } from '../../lib/settings';
+
+const events = await getEvents();
+const today = todayInKyiv();
+const { upcoming, past } = splitEvents(events, today);
+const months = calendarMonths(events.map(calendarItem), today);
+---
+
+<BaseLayout title="Події" description="Події турклубу «Глобус»: лекції, тренування, змагання, клубні вечори й виїзди.">
+  <PageHeader
+    title="Події"
+    lead="Лекції, тренування, змагання, клубні вечори й виїзди. Майбутні — угорі, минулі — нижче."
+    breadcrumbs={[{ label: 'Події' }]}
+  >
+    <ViewSwitch
+      group="events"
+      label="Вигляд подій"
+      views={[
+        { id: 'list', label: 'Список', icon: 'list' },
+        { id: 'calendar', label: 'Календар', icon: 'calendar' },
+      ]}
+    />
+  </PageHeader>
+
+  <ViewPanel group="events" view="list" active>
+    <Section id="upcoming" title="Найближчі події">
+      {
+        upcoming.length ? (
+          <CardGrid columns={3}>
+            {upcoming.map((entry) => (
+              <EventCard
+                title={entry.data.title}
+                href={eventHref(entry)}
+                start={entry.data.start}
+                end={entry.data.end}
+                location={entry.data.location}
+                description={entry.data.description}
+                image={entry.data.cover}
+                imageAlt={entry.data.coverAlt}
+              />
+            ))}
+          </CardGrid>
+        ) : (
+          <EmptyState
+            icon="calendar"
+            title="Найближчих подій поки немає"
+            text="Анонси лекцій, тренувань і виїздів зʼявляються в Telegram-чаті клубу."
+          >
+            <Button href={settings.channels.telegram} variant="secondary" icon="send">
+              Telegram-чат
+            </Button>
+          </EmptyState>
+        )
+      }
+    </Section>
+
+    <Section id="past" tone="surface" title="Минулі події">
+      {
+        past.length ? (
+          <CardGrid columns={3}>
+            {past.map((entry) => (
+              <EventCard
+                title={entry.data.title}
+                href={eventHref(entry)}
+                start={entry.data.start}
+                end={entry.data.end}
+                location={entry.data.location}
+              />
+            ))}
+          </CardGrid>
+        ) : (
+          <EmptyState icon="calendar" title="Минулих подій поки немає" />
+        )
+      }
+    </Section>
+  </ViewPanel>
+
+  <ViewPanel group="events" view="calendar">
+    <Section>
+      <EventCalendar months={months} initial={currentMonthKey(today)} />
+    </Section>
+  </ViewPanel>
+</BaseLayout>

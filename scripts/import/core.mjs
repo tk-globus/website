@@ -7,6 +7,7 @@ import { existsSync, mkdirSync, readFileSync, readdirSync, writeFileSync } from 
 import { basename, dirname, extname, join, relative, sep } from 'node:path';
 import YAML from 'yaml';
 import { htmlToMarkdown, isOldSiteFile, nodeId } from './html.mjs';
+import { rewriteLinks } from './links.mjs';
 import { slugify } from './slug.mjs';
 
 // Формати, які вміє оптимізувати збірка Astro. Інші фото лишаються посиланням на старий сайт.
@@ -76,13 +77,16 @@ function imageFileName(src, taken) {
 const toPosix = (p) => p.split(sep).join('/');
 
 /**
- * Імпорт одного запису. Повертає { slug, file, status: created | updated | unchanged, warnings }.
+ * Імпорт одного запису. Повертає { slug, file, status: created | updated | unchanged | skipped, warnings }.
  * @param {object} type тип контенту (scripts/import/types/)
  * @param {string} url адреса сторінки на старому сайті
- * @param {{ root: string, fetcher: object, index: object }} ctx
+ * @param {{ root: string, fetcher: object, index: object, links?: Map<string, string> }} ctx
+ *   links — адреси перенесених записів (старий сайт → новий), на які переводяться посилання тіла
  */
-export async function importItem(type, url, { root, fetcher, index }) {
+export async function importItem(type, url, { root, fetcher, index, links }) {
   const parsed = type.parse(await fetcher.text(url), url);
+  // Парсер може свідомо пропустити запис (порожня чернетка на старому сайті) — це не помилка імпорту.
+  if (parsed.skip) return { slug: null, file: null, status: 'skipped', reason: parsed.skip, warnings: [], unrecognized: [] };
   // Парсер може повернути власні попередження і значення, яких немає в переліках схеми (звіти).
   const unrecognized = parsed.unrecognized ?? [];
   const warnings = [
@@ -130,14 +134,15 @@ export async function importItem(type, url, { root, fetcher, index }) {
   // Завантажуємо лише фото, що стануть Markdown-картинками. Фото всередині сирого HTML (таблиці з
   // обʼєднаними клітинками) лишаються посиланням на старий сайт: збірка відносних шляхів у HTML не бачить.
   // Пробний прогін: кожне фото отримує мітку; мітки, що дійшли до Markdown, — це фото поза сирим HTML.
+  const bodyHtml = rewriteLinks(parsed.bodyHtml, links);
   const seen = [];
-  const draft = htmlToMarkdown(parsed.bodyHtml, { resolveImage: (src) => `tkg-image-${seen.push(src)}-` });
+  const draft = htmlToMarkdown(bodyHtml, { resolveImage: (src) => `tkg-image-${seen.push(src)}-` });
   const imageMap = new Map();
   for (const [i, src] of seen.entries()) {
     if (!draft.includes(`tkg-image-${i + 1}-`) || !isOldSiteFile(src) || imageMap.has(src)) continue;
     imageMap.set(src, (await localImage(src)) ?? src);
   }
-  const markdown = htmlToMarkdown(parsed.bodyHtml, { resolveImage: (src) => imageMap.get(src) ?? src });
+  const markdown = htmlToMarkdown(bodyHtml, { resolveImage: (src) => imageMap.get(src) ?? src });
 
   const text = renderEntry(
     {
@@ -201,12 +206,18 @@ export async function runImport(type, { root, fetcher, scope = 'sample', limit, 
   let urls = await collectUrls(type, { scope, fetcher, log });
   if (limit) urls = urls.slice(0, limit);
   const index = indexExisting(join(root, type.contentDir));
+  // Тип може переводити посилання на вже перенесені записи на новий сайт (новини → звіти бібліотеки).
+  const links = type.localLinks?.(root);
   const results = [];
   const failed = [];
   for (const url of urls) {
     try {
-      const result = await importItem(type, url, { root, fetcher, index });
+      const result = await importItem(type, url, { root, fetcher, index, links });
       results.push({ url, ...result });
+      if (result.status === 'skipped') {
+        log(`- пропущено  ${url}: ${result.reason}`);
+        continue;
+      }
       log(`${{ created: '+ нове', updated: '~ оновлено', unchanged: '= без змін' }[result.status]}  ${result.file}`);
       for (const w of result.warnings) log(`    ! ${w}`);
     } catch (e) {

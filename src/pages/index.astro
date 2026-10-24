@@ -5,14 +5,19 @@ import BaseLayout from '../layouts/BaseLayout.astro';
 import Activities, { type Activity } from '../components/Activities.astro';
 import Button from '../components/Button.astro';
 import CardGrid from '../components/CardGrid.astro';
+import NewsCard from '../components/NewsCard.astro';
+import { getNews, newsHref } from '../lib/news';
 import Channels from '../components/Channels.astro';
 import Hero from '../components/Hero.astro';
 import Prose from '../components/Prose.astro';
 import ReportCard from '../components/ReportCard.astro';
+import EventCard from '../components/EventCard.astro';
+import EmptyState from '../components/EmptyState.astro';
 import Section from '../components/Section.astro';
 import { joinLink } from '../lib/nav';
 import { settings } from '../lib/settings';
 import { getReports, reportHref, reportsCount } from '../lib/reports';
+import { eventHref, getEvents, splitEvents } from '../lib/events';
 import heroPhoto from '../assets/photos/korostyshiv-2026.jpg';
 
 const activities: Activity[] = [
@@ -45,8 +50,14 @@ const activities: Activity[] = [
   },
 ];
 
+// Тікет 06: три найближчі події (майбутні — за датою під час збірки).
+const { upcoming: upcomingEvents } = splitEvents(await getEvents());
+
 // Тікет 07: вхід у бібліотеку — три найсвіжіші звіти.
 const reports = await getReports();
+
+// Тікет 05b: чотири останні новини.
+const latestNews = (await getNews()).slice(0, 4);
 ---
 
 <BaseLayout>
@@ -80,10 +91,52 @@ const reports = await getReports();
     <Activities items={activities} />
   </Section>
 
-  {/* Тікет 06: три найближчі події. */}
-  {/* Тікет 05b: 3–4 останні новини. */}
+  <Section title="Найближчі події" intro="Лекції, тренування, змагання й виїзди — приходьте.">
+    <Button slot="action" href="/events" variant="secondary" icon="arrow-right">Усі події</Button>
+    {
+      upcomingEvents.length ? (
+        <CardGrid columns={3}>
+          {upcomingEvents.slice(0, 3).map((entry) => (
+            <EventCard
+              title={entry.data.title}
+              href={eventHref(entry)}
+              start={entry.data.start}
+              end={entry.data.end}
+              location={entry.data.location}
+              image={entry.data.cover}
+              imageAlt={entry.data.coverAlt}
+            />
+          ))}
+        </CardGrid>
+      ) : (
+        <EmptyState
+          icon="calendar"
+          title="Найближчих подій поки немає"
+          text="Анонси зʼявляються в Telegram-чаті клубу, а минулі лекції й виїзди — на сторінці подій."
+        />
+      )
+    }
+  </Section>
+
+  <Section tone="surface" title="Останні новини" intro="Походи, тренування й клубні вечори — що відбувається в клубі.">
+    <Button slot="action" href="/news" variant="secondary" icon="arrow-right">Усі новини</Button>
+    <CardGrid columns={4}>
+      {
+        latestNews.map((entry) => (
+          <NewsCard
+            title={entry.data.title}
+            href={newsHref(entry)}
+            date={entry.data.date}
+            description={entry.data.description}
+            image={entry.data.cover}
+            imageAlt={entry.data.coverAlt}
+          />
+        ))
+      }
+    </CardGrid>
+  </Section>
+
   <Section
-    tone="surface"
     title="Бібліотека звітів"
     intro={`${reportsCount(reports.length)} про походи учасників клубу — Карпати, Кавказ, Тянь-Шань, Памір: нитки маршрутів, фото й PDF.`}
   >
@@ -108,7 +161,7 @@ const reports = await getReports();
     </CardGrid>
   </Section>
 
-  <Section title="Канали клубу" intro="Підписуйтеся, щоб бачити анонси походів, лекцій і клубних вечорів.">
+  <Section tone="surface" title="Канали клубу" intro="Підписуйтеся, щоб бачити анонси походів, лекцій і клубних вечорів.">
     <Channels />
   </Section>
 
