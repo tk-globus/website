@@ -5,6 +5,8 @@ import BaseLayout from '../layouts/BaseLayout.astro';
 import Activities, { type Activity } from '../components/Activities.astro';
 import Button from '../components/Button.astro';
 import CardGrid from '../components/CardGrid.astro';
+import NewsCard from '../components/NewsCard.astro';
+import { getNews, newsHref } from '../lib/news';
 import Channels from '../components/Channels.astro';
 import Hero from '../components/Hero.astro';
 import Prose from '../components/Prose.astro';
@@ -47,6 +49,9 @@ const activities: Activity[] = [
 
 // Тікет 07: вхід у бібліотеку — три найсвіжіші звіти.
 const reports = await getReports();
+
+// Тікет 05b: чотири останні новини.
+const latestNews = (await getNews()).slice(0, 4);
 ---
 
 <BaseLayout>
@@ -82,6 +87,24 @@ const reports = await getReports();
 
   {/* Тікет 06: три найближчі події. */}
   {/* Тікет 05b: 3–4 останні новини. */}
+  <Section title="Останні новини" intro="Походи, тренування й клубні вечори — що відбувається в клубі.">
+    <Button slot="action" href="/news" variant="secondary" icon="arrow-right">Усі новини</Button>
+    <CardGrid columns={4}>
+      {
+        latestNews.map((entry) => (
+          <NewsCard
+            title={entry.data.title}
+            href={newsHref(entry)}
+            date={entry.data.date}
+            description={entry.data.description}
+            image={entry.data.cover}
+            imageAlt={entry.data.coverAlt}
+          />
+        ))
+      }
+    </CardGrid>
+  </Section>
+
   <Section
     tone="surface"
     title="Бібліотека звітів"

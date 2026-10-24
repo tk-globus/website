@@ -1,6 +1,8 @@
 ---
 // Хлібні крихти: «Головна › Розділ › Сторінка». «Головна» додається сама;
-// останній пункт — поточна сторінка (без посилання).
+// останній пункт без href — поточна сторінка (без посилання). Якщо в останнього пункту є href, це розділ,
+// а назву самої сторінки показує заголовок під крихтами (сторінка новини: «Головна › Новини» + h1) —
+// так назва не повторюється двічі поспіль.
 import Icon from './Icon.astro';
 
 export interface Crumb {
@@ -20,10 +22,11 @@ const crumbs: Crumb[] = [{ label: 'Головна', href: '/' }, ...Astro.props.
     {
       crumbs.map((crumb, i) => {
         const isLast = i === crumbs.length - 1;
+        const isCurrent = isLast && !crumb.href;
         return (
           <li class="flex items-center gap-1">
-            {isLast || !crumb.href ? (
-              <span aria-current={isLast ? 'page' : undefined} class:list={[isLast && 'text-ink']}>
+            {isCurrent || !crumb.href ? (
+              <span aria-current={isCurrent ? 'page' : undefined} class:list={[isCurrent && 'text-ink']}>
                 {crumb.label}
               </span>
             ) : (

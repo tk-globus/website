@@ -14,6 +14,7 @@ import {
   summarize,
   trimBreaks,
 } from '../html.mjs';
+import { libraryLinks } from '../links.mjs';
 
 const sampleFile = new URL('../samples/news-events.json', import.meta.url);
 
@@ -34,6 +35,9 @@ export default {
   listSources: [`${OLD_SITE}/taxonomy/term/2191`, `${OLD_SITE}/taxonomy/term/2180`],
 
   parseList: (html) => parseTeaserList(html, 'news'),
+
+  /** Анонси звітів: посилання на звіт, уже імпортований у бібліотеку, ведуть на /library/<slug>. */
+  localLinks: libraryLinks,
 
   /**
    * HTML сторінки новини → поля запису. Фото тут ще віддалені (адреси оригіналів на старому сайті);

@@ -15,6 +15,8 @@ import Hero from '../components/Hero.astro';
 import PageHeader from '../components/PageHeader.astro';
 import Prose from '../components/Prose.astro';
 import ReportCard from '../components/ReportCard.astro';
+import NewsCard from '../components/NewsCard.astro';
+import Pagination from '../components/Pagination.astro';
 import Section from '../components/Section.astro';
 import Tag from '../components/Tag.astro';
 import ColorTokens from '../components/styleguide/ColorTokens.astro';
@@ -168,6 +170,27 @@ const activities: Activity[] = [
         ]}
       />
     </Specimen>
+    <Specimen
+      title="Картки новин"
+      usage={'<NewsCard title href date description image /> — без фото показує заглушку (Card placeholder)'}
+    >
+      <CardGrid>
+        <NewsCard
+          href="/styleguide"
+          title="Перше тренування Групи А"
+          date={new Date('2026-09-14')}
+          description="48 новачків розпочали навчальний рік: лекція про біг, вузли й перша спільна пробіжка."
+          image={korostyshiv}
+          imageAlt="Учасники клубу на виїзді в Коростишеві"
+        />
+        <NewsCard
+          href="/styleguide"
+          title="Кубок «Сніговий барс 2024»"
+          date={new Date('2024-01-13')}
+          description="Змагання звʼязок на опорній стінці Зеленого театру в Києві."
+        />
+      </CardGrid>
+    </Specimen>
   </Section>
 
   <Section id="activities" tone="surface" title="Напрями діяльності" intro="Блок для головної: чим займається клуб.">
@@ -212,6 +235,9 @@ const activities: Activity[] = [
   <Section id="navigation" title="Навігація">
     <Specimen title="Хлібні крихти" usage={'<Breadcrumbs items={[{ label, href }]} />'}>
       <Breadcrumbs items={[{ label: 'Бібліотека', href: '/styleguide' }, { label: 'Пішохідний похід 2 к.с. Чорногорою' }]} />
+    </Specimen>
+    <Specimen title="Пагінація" usage={'<Pagination base="/news" current={2} total={3} label="Сторінки новин" />'}>
+      <Pagination base="/styleguide" href={() => '/styleguide'} current={2} total={3} label="Сторінки прикладу" />
     </Specimen>
     <Specimen title="Шапка сторінки" usage={'<PageHeader title="…" lead="…" breadcrumbs={…} />'} bleed>
       <PageHeader
