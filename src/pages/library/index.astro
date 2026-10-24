@@ -1,12 +1,21 @@
 ---
-// Бібліотека звітів про походи: картки від найсвіжіших до найстаріших. Фільтри (район, вид, к.с., рік) — тікет 08.
+// Бібліотека звітів про походи: картки від найсвіжіших до найстаріших, над ними — панель фільтрів
+// (район, вид, к.с., рік; стан в адресі). Без JavaScript видно повний список.
 import BaseLayout from '../../layouts/BaseLayout.astro';
 import PageHeader from '../../components/PageHeader.astro';
 import Section from '../../components/Section.astro';
 import CardGrid from '../../components/CardGrid.astro';
 import ReportCard from '../../components/ReportCard.astro';
 import EmptyState from '../../components/EmptyState.astro';
-import { getReports, reportHref, reportsCount } from '../../lib/reports';
+import FilterPanel from '../../components/FilterPanel.astro';
+import {
+  REPORT_NOUNS,
+  getReports,
+  reportFilterFields,
+  reportFilterValues,
+  reportHref,
+  reportsCount,
+} from '../../lib/reports';
 
 const reports = await getReports();
 ---
@@ -23,23 +32,33 @@ const reports = await getReports();
   <Section>
     {
       reports.length ? (
-        <CardGrid columns={3}>
-          {reports.map((entry) => (
-            <ReportCard
-              headingLevel={2}
-              title={entry.data.title}
-              href={reportHref(entry)}
-              kind={entry.data.kind}
-              grade={entry.data.grade}
-              regions={entry.data.regions}
-              year={entry.data.year}
-              authors={entry.data.authors}
-              route={entry.data.route}
-              image={entry.data.cover}
-              imageAlt={entry.data.coverAlt}
-            />
-          ))}
-        </CardGrid>
+        <FilterPanel
+          label="Фільтри звітів"
+          fields={reportFilterFields(reports)}
+          nouns={REPORT_NOUNS}
+          emptyTitle="Звітів не знайдено"
+          emptyText="У бібліотеці немає звітів з таким поєднанням фільтрів. Приберіть частину фільтрів або скиньте всі."
+          headingLevel={2}
+        >
+          <CardGrid columns={3}>
+            {reports.map((entry) => (
+              <ReportCard
+                headingLevel={2}
+                title={entry.data.title}
+                href={reportHref(entry)}
+                kind={entry.data.kind}
+                grade={entry.data.grade}
+                regions={entry.data.regions}
+                year={entry.data.year}
+                authors={entry.data.authors}
+                route={entry.data.route}
+                image={entry.data.cover}
+                imageAlt={entry.data.coverAlt}
+                filterValues={reportFilterValues(entry)}
+              />
+            ))}
+          </CardGrid>
+        </FilterPanel>
       ) : (
         <EmptyState headingLevel={2} title="Звітів поки немає" />
       )

@@ -23,6 +23,8 @@ import NewsCard from '../components/NewsCard.astro';
 import Pagination from '../components/Pagination.astro';
 import Section from '../components/Section.astro';
 import Tag from '../components/Tag.astro';
+import FilterPanel from '../components/FilterPanel.astro';
+import type { FilterField } from '../lib/filters';
 import ColorTokens from '../components/styleguide/ColorTokens.astro';
 import EffectTokens from '../components/styleguide/EffectTokens.astro';
 import IconList from '../components/styleguide/IconList.astro';
@@ -49,7 +51,7 @@ const sections = [
   { id: 'sections', label: 'Секції' },
   { id: 'hero', label: 'Герой' },
   { id: 'navigation', label: 'Навігація' },
-  { id: 'empty', label: 'Порожній стан' },
+  { id: 'empty', label: 'Фільтри й порожній стан' },
   { id: 'prose', label: 'Текст' },
 ];
 
@@ -72,6 +74,46 @@ const activities: Activity[] = [
   { icon: 'tent', title: 'Табір «Глобус»', text: 'Літній табір і школа інструкторів.' },
   { icon: 'flag', title: 'Змагання', text: 'Туристичні змагання й ралі для команд клубу.' },
   { icon: 'campfire', title: 'Клубні вечори', text: 'Щомісяця: розповіді з походів, фото, знайомства.' },
+];
+
+// Приклад полів панелі фільтрів; на /library поля й значення беруться з переліків схеми (reportFilterFields).
+const sampleFilterFields: FilterField[] = [
+  {
+    name: 'region',
+    label: 'Район',
+    anyLabel: 'Усі райони',
+    options: [
+      { value: 'Карпати', label: 'Карпати' },
+      { value: 'Кавказ', label: 'Кавказ' },
+    ],
+  },
+  {
+    name: 'kind',
+    label: 'Вид туризму',
+    anyLabel: 'Усі види',
+    options: [
+      { value: 'гірський', label: 'гірський' },
+      { value: 'пішохідний', label: 'пішохідний' },
+    ],
+  },
+  {
+    name: 'grade',
+    label: 'Категорія складності',
+    anyLabel: 'Будь-яка',
+    options: [
+      { value: '2', label: '2 к.с.' },
+      { value: '3', label: '3 к.с.' },
+    ],
+  },
+  {
+    name: 'year',
+    label: 'Рік',
+    anyLabel: 'Усі роки',
+    options: [
+      { value: '2024', label: '2024' },
+      { value: '2019', label: '2019' },
+    ],
+  },
 ];
 ---
 
@@ -315,7 +357,43 @@ const activities: Activity[] = [
     </Specimen>
   </Section>
 
-  <Section id="empty" tone="surface" title="Порожній стан">
+  <Section id="empty" tone="surface" title="Фільтри й порожній стан">
+    <Specimen
+      title="Панель фільтрів"
+      usage={'<FilterPanel fields label nouns emptyTitle emptyText> список з data-filter-values (ReportCard filterValues) </FilterPanel>'}
+    >
+      <FilterPanel
+        id="sample-filters"
+        label="Фільтри прикладу"
+        fields={sampleFilterFields}
+        nouns={['звіт', 'звіти', 'звітів']}
+        emptyTitle="Звітів не знайдено"
+        emptyText="Приберіть частину фільтрів або скиньте всі."
+      >
+        <CardGrid>
+          <ReportCard
+            href="/styleguide"
+            title="Пішохідний похід 2 к.с. Чорногорою"
+            route="Ворохта — Говерла — Петрос — Кваси."
+            regions={['Карпати']}
+            kind="пішохідний"
+            grade="2"
+            year={2024}
+            filterValues={{ region: ['Карпати'], kind: ['пішохідний'], grade: ['2'], year: ['2024'] }}
+          />
+          <ReportCard
+            href="/styleguide"
+            title="Гірський похід 3 к.с. Сванетією"
+            route="Местіа — пер. Твібер — Мазері."
+            regions={['Кавказ']}
+            kind="гірський"
+            grade="3"
+            year={2019}
+            filterValues={{ region: ['Кавказ'], kind: ['гірський'], grade: ['3'], year: ['2019'] }}
+          />
+        </CardGrid>
+      </FilterPanel>
+    </Specimen>
     <Specimen title="Нічого не знайдено" usage={'<EmptyState title="…" text="…">'}>
       <EmptyState title="Звітів не знайдено" text="Спробуйте прибрати частину фільтрів.">
         <Button href="/styleguide" variant="secondary">Скинути фільтри</Button>

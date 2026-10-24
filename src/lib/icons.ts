@@ -23,6 +23,7 @@ export const iconPaths = {
   message: '<path d="M4 4.5h16v11H10l-6 4.5z"/><path d="M8 9h8M8 12h5"/>',
   mail: '<rect x="3" y="5" width="18" height="14" rx="2"/><path d="m3.5 6 8.5 7 8.5-7"/>',
   download: '<path d="M12 3.5v12M7 10.5l5 5 5-5"/><path d="M4.5 20h15"/>',
+  filter: '<path d="M4 6.5h16M7 12h10M10 17.5h4"/>',
 } as const;
 
 export type IconName = keyof typeof iconPaths;
