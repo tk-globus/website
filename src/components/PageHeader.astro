@@ -1,6 +1,7 @@
 ---
 // Шапка звичайної сторінки (без фото): хлібні крихти, заголовок (h1), вступ.
 // Слот — під вступом (зміст сторінки, фільтри). Сторінкам із великим фото — компонент Hero.
+// Довгі слова в заголовку переносяться з дефісом (hyphens-auto, мова — lang="uk"), як і в Hero та Section (тікет 10).
 import Breadcrumbs, { type Crumb } from './Breadcrumbs.astro';
 import Container from './Container.astro';
 
@@ -19,7 +20,7 @@ const Heading = `h${headingLevel}` as const;
 <div data-component="PageHeader" class="border-b border-line/soft bg-surface">
   <Container class="py-10 md:py-14">
     {breadcrumbs && <Breadcrumbs items={breadcrumbs} />}
-    <Heading class:list={['text-3xl font-bold text-brand wrap-break-word md:text-4xl', breadcrumbs && 'mt-4']}>{title}</Heading>
+    <Heading class:list={['text-3xl font-bold text-brand wrap-break-word hyphens-auto md:text-4xl', breadcrumbs && 'mt-4']}>{title}</Heading>
     {lead && <p class="mt-4 max-w-text text-lg text-muted">{lead}</p>}
     {
       Astro.slots.has('default') && (

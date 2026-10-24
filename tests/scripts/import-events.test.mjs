@@ -9,7 +9,7 @@ import { dirname, join, resolve } from 'node:path';
 import { z } from 'astro/zod';
 import { eventSchema } from '../../src/lib/schemas/event.ts';
 import { readFrontmatter, runImport } from '../../scripts/import/core.mjs';
-import events, { findLocation, parseEventDate } from '../../scripts/import/types/events.mjs';
+import events, { cleanEventTitle, findLocation, parseEventDate } from '../../scripts/import/types/events.mjs';
 
 const fixture = (name) => readFileSync(new URL(`../fixtures/old-site/${name}`, import.meta.url), 'utf8');
 const AUTUMN = 'https://www.tkg.org.ua/node/37939';
@@ -64,7 +64,7 @@ test('подія «Осінній лист 2026»: дата й час, поси�
   const { file, data, body } = readEntry(root, 'vidkryte-zmahalne-trenuvannia-osinnii-lyst-2026');
   const parsed = schema.safeParse(data);
   assert.ok(parsed.success, parsed.error?.message);
-  assert.equal(data.title, 'Відкрите змагальне тренування "Осінній лист 2026"');
+  assert.equal(data.title, 'Відкрите змагальне тренування «Осінній лист 2026»');
   assert.equal(data.start, '2026-10-25T08:00');
   assert.equal(data.end, undefined);
   assert.equal(data.location, undefined, 'рядка «Де:» у тексті немає');
@@ -93,13 +93,23 @@ test('подія «Осінній лист 2026»: дата й час, поси�
 test('лекція з часом закінчення і місцем «Де: Онлайн, Zoom: …»', async (t) => {
   const root = tempRoot(t);
   await runImport(withUrls([LECTURE]), { root, fetcher: fakeFetcher() });
-  const { data } = readEntry(root, 'lektsiia-hirski-perepravy-02-04-2025');
+  const { data } = readEntry(root, 'lektsiia-hirski-perepravy');
   assert.ok(schema.safeParse(data).success);
+  assert.equal(data.title, 'Лекція «Гірські переправи»', 'без дати в кінці, українські лапки');
   assert.equal(data.start, '2025-04-02T19:00');
   assert.equal(data.end, '2025-04-02T21:00');
   assert.equal(data.location, 'Онлайн, Zoom');
   assert.equal(data.links, undefined, 'Zoom — не посилання події (воно лишається в тексті)');
   assert.equal(data.legacyUrl, LECTURE);
+});
+
+test('назва події: дата в кінці прибирається, прямі лапки стають «ялинками»', () => {
+  assert.equal(cleanEventTitle('Лекція "Орієнтування" - 19.10.2023'), 'Лекція «Орієнтування»');
+  assert.equal(cleanEventTitle('Лекція "Лавинна небезпека" 13.02.2025'), 'Лекція «Лавинна небезпека»');
+  assert.equal(cleanEventTitle('Клубний вечір - 18.04.2024'), 'Клубний вечір');
+  assert.equal(cleanEventTitle('Брифінг "Сніговий Барс - 2024"'), 'Брифінг «Сніговий Барс - 2024»', 'рік у назві лишається');
+  assert.equal(cleanEventTitle('Київський Листопад 2023. Анонс'), 'Київський Листопад 2023. Анонс');
+  assert.equal(cleanEventTitle("Лекція \"Обов'язки керівника походів\" - 15.02.2024"), "Лекція «Обов'язки керівника походів»");
 });
 
 test('порожня чернетка (заголовок «.», без тексту) пропускається без файлу і без помилки', async (t) => {

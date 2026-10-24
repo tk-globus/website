@@ -137,6 +137,7 @@ test('календар: «сьогодні» і місяць, що відкри�
   await expect(visibleMonth).toHaveAttribute('data-month', '2026-10');
   await expect(page.locator('[aria-current="date"]')).toHaveCount(1);
   await expect(visibleMonth.locator('[aria-current="date"]')).toHaveAttribute('data-date', '2026-10-10');
+  await expect(page.locator('[data-today]')).toHaveAttribute('data-date', '2026-10-10'); // видиме виділення — один день
 });
 
 test('календар: після повернення до списку в адресі немає ?month=, а календар памʼятає місяць', async ({ page }) => {
