@@ -58,11 +58,11 @@ const sections = [
 // Приклад календаря подій: два місяці, подія на кілька днів і два записи в один день.
 const sampleMonths = calendarMonths(
   [
-    { title: 'Лекція «Орієнтування»', href: '/styleguide', start: '2026-10-15T19:00', end: '2026-10-15T21:00' },
-    { title: '«Осінній лист 2026»', href: '/styleguide', start: '2026-10-25T08:00' },
-    { title: 'Навчальний виїзд Групи А', href: '/styleguide', start: '2026-11-07T07:00', end: '2026-11-08T19:00' },
-    { title: 'Клубний вечір', href: '/styleguide', start: '2026-11-25T19:00' },
-    { title: 'Тренування', href: '/styleguide', start: '2026-11-25T10:00' },
+    { title: 'Лекція «Орієнтування»', href: '/styleguide/', start: '2026-10-15T19:00', end: '2026-10-15T21:00' },
+    { title: '«Осінній лист 2026»', href: '/styleguide/', start: '2026-10-25T08:00' },
+    { title: 'Навчальний виїзд Групи А', href: '/styleguide/', start: '2026-11-07T07:00', end: '2026-11-08T19:00' },
+    { title: 'Клубний вечір', href: '/styleguide/', start: '2026-11-25T19:00' },
+    { title: 'Тренування', href: '/styleguide/', start: '2026-11-25T10:00' },
   ],
   '2026-10-24',
 );
@@ -151,15 +151,15 @@ const sampleFilterFields: FilterField[] = [
   <Section id="buttons" title="Кнопки" intro="Основна — головна дія на екрані (одна). Вторинна — додаткові дії.">
     <Specimen title="Основна і вторинна" usage={'<Button href="/join">…</Button> · <Button variant="secondary">'}>
       <Cluster>
-        <Button href="/styleguide">Долучитися</Button>
-        <Button href="/styleguide" variant="secondary">Усі новини</Button>
-        <Button href="/styleguide" icon="arrow-right">З іконкою</Button>
+        <Button href="/styleguide/">Долучитися</Button>
+        <Button href="/styleguide/" variant="secondary">Усі новини</Button>
+        <Button href="/styleguide/" icon="arrow-right">З іконкою</Button>
       </Cluster>
     </Specimen>
     <Specimen title="Великі" usage={'<Button size="lg">'}>
       <Cluster>
-        <Button href="/styleguide" size="lg">Долучитися</Button>
-        <Button href="/styleguide" size="lg" variant="secondary">Про клуб</Button>
+        <Button href="/styleguide/" size="lg">Долучитися</Button>
+        <Button href="/styleguide/" size="lg" variant="secondary">Про клуб</Button>
       </Cluster>
     </Specimen>
     <Specimen title="Неактивна (сторінки ще немає)" usage={'<Button href={null}>'}>
@@ -191,7 +191,7 @@ const sampleFilterFields: FilterField[] = [
   >
     <CardGrid>
       <Card
-        href="/styleguide"
+        href="/styleguide/"
         image={korostyshiv}
         imageAlt="Учасники клубу на виїзді в Коростишеві"
         title="Навчальний виїзд Групи А в Коростишів"
@@ -199,12 +199,12 @@ const sampleFilterFields: FilterField[] = [
       >
         <Fragment slot="meta">29 вересня 2026</Fragment>
       </Card>
-      <Card href="/styleguide" title="«Осінній лист 2026»" description="Традиційні клубні змагання з туристичної техніки.">
+      <Card href="/styleguide/" title="«Осінній лист 2026»" description="Традиційні клубні змагання з туристичної техніки.">
         <Fragment slot="meta"><Tag tone="accent">майбутня</Tag> 15–16 листопада 2026</Fragment>
         <Fragment slot="footer">Київська обл.</Fragment>
       </Card>
       <ReportCard
-        href="/styleguide"
+        href="/styleguide/"
         image={petros}
         imageAlt="Група на вершині Петроса"
         title="Пішохідний похід 2 к.с. Чорногорою"
@@ -236,7 +236,7 @@ const sampleFilterFields: FilterField[] = [
     >
       <CardGrid>
         <NewsCard
-          href="/styleguide"
+          href="/styleguide/"
           title="Перше тренування Групи А"
           date={new Date('2026-09-14')}
           description="48 новачків розпочали навчальний рік: лекція про біг, вузли й перша спільна пробіжка."
@@ -244,7 +244,7 @@ const sampleFilterFields: FilterField[] = [
           imageAlt="Учасники клубу на виїзді в Коростишеві"
         />
         <NewsCard
-          href="/styleguide"
+          href="/styleguide/"
           title="Кубок «Сніговий барс 2024»"
           date={new Date('2024-01-13')}
           description="Змагання звʼязок на опорній стінці Зеленого театру в Києві."
@@ -262,7 +262,7 @@ const sampleFilterFields: FilterField[] = [
     <Specimen title="Картки подій" usage={'<EventCard title href start end location description image />'}>
       <CardGrid>
         <EventCard
-          href="/styleguide"
+          href="/styleguide/"
           title="Відкрите змагальне тренування «Осінній лист 2026»"
           start="2026-10-25T08:00"
           location="Київ, Голосіївський парк"
@@ -270,8 +270,8 @@ const sampleFilterFields: FilterField[] = [
           image={korostyshiv}
           imageAlt="Учасники клубу на виїзді в Коростишеві"
         />
-        <EventCard href="/styleguide" title="Лекція «Гірські переправи»" start="2025-04-02T19:00" end="2025-04-02T21:00" location="Онлайн, Zoom" />
-        <EventCard href="/styleguide" title="Клубний виїзд у Дениші" start="2023-10-28T07:00" end="2023-10-29T19:00" />
+        <EventCard href="/styleguide/" title="Лекція «Гірські переправи»" start="2025-04-02T19:00" end="2025-04-02T21:00" location="Онлайн, Zoom" />
+        <EventCard href="/styleguide/" title="Клубний виїзд у Дениші" start="2023-10-28T07:00" end="2023-10-29T19:00" />
       </CardGrid>
     </Specimen>
     <Specimen
@@ -309,13 +309,13 @@ const sampleFilterFields: FilterField[] = [
   <Section id="sections" title="Секції" intro="Сторінка складається з секцій. Фон чергується, щоб розділити блоки.">
     <Specimen title="Секція на світлому фоні" usage={'<Section tone="surface" title="…" intro="…">'} bleed>
       <Section tone="surface" title="Найближчі події" intro="Вступ до секції — одне-два речення.">
-        <Button href="/styleguide" variant="secondary" slot="action" icon="arrow-right">Усі події</Button>
+        <Button href="/styleguide/" variant="secondary" slot="action" icon="arrow-right">Усі події</Button>
         <Prose><p>Вміст секції.</p></Prose>
       </Section>
     </Specimen>
     <Specimen title="Секція на бірюзовому фоні" usage={'<Section tone="brand">'} bleed>
       <Section tone="brand" title="Долучайтеся до клубу" intro="Вік і вуз не важливі — важливе бажання ходити в гори.">
-        <Button href="/styleguide" variant="secondary" size="lg">Долучитися</Button>
+        <Button href="/styleguide/" variant="secondary" size="lg">Долучитися</Button>
       </Section>
     </Specimen>
   </Section>
@@ -329,18 +329,18 @@ const sampleFilterFields: FilterField[] = [
         title="Турклуб КПІ «Глобус»"
         lead="Некомерційний туристський клуб з 1952 року. Відкритий для всіх."
       >
-        <Button href="/styleguide" size="lg">Долучитися</Button>
-        <Button href="/styleguide" size="lg" variant="secondary">Про клуб</Button>
+        <Button href="/styleguide/" size="lg">Долучитися</Button>
+        <Button href="/styleguide/" size="lg" variant="secondary">Про клуб</Button>
       </Hero>
     </Specimen>
   </Section>
 
   <Section id="navigation" title="Навігація">
     <Specimen title="Хлібні крихти" usage={'<Breadcrumbs items={[{ label, href }]} />'}>
-      <Breadcrumbs items={[{ label: 'Бібліотека', href: '/styleguide' }, { label: 'Пішохідний похід 2 к.с. Чорногорою' }]} />
+      <Breadcrumbs items={[{ label: 'Бібліотека', href: '/styleguide/' }, { label: 'Пішохідний похід 2 к.с. Чорногорою' }]} />
     </Specimen>
     <Specimen title="Пагінація" usage={'<Pagination base="/news" current={2} total={3} label="Сторінки новин" />'}>
-      <Pagination base="/styleguide" href={() => '/styleguide'} current={2} total={3} label="Сторінки прикладу" />
+      <Pagination base="/styleguide/" href={() => '/styleguide/'} current={2} total={3} label="Сторінки прикладу" />
     </Specimen>
     <Specimen title="Шапка сторінки" usage={'<PageHeader title="…" lead="…" breadcrumbs={…} />'} bleed>
       <PageHeader
@@ -372,7 +372,7 @@ const sampleFilterFields: FilterField[] = [
       >
         <CardGrid>
           <ReportCard
-            href="/styleguide"
+            href="/styleguide/"
             title="Пішохідний похід 2 к.с. Чорногорою"
             route="Ворохта — Говерла — Петрос — Кваси."
             regions={['Карпати']}
@@ -382,7 +382,7 @@ const sampleFilterFields: FilterField[] = [
             filterValues={{ region: ['Карпати'], kind: ['пішохідний'], grade: ['2'], year: ['2024'] }}
           />
           <ReportCard
-            href="/styleguide"
+            href="/styleguide/"
             title="Гірський похід 3 к.с. Сванетією"
             route="Местіа — пер. Твібер — Мазері."
             regions={['Кавказ']}
@@ -396,7 +396,7 @@ const sampleFilterFields: FilterField[] = [
     </Specimen>
     <Specimen title="Нічого не знайдено" usage={'<EmptyState title="…" text="…">'}>
       <EmptyState title="Звітів не знайдено" text="Спробуйте прибрати частину фільтрів.">
-        <Button href="/styleguide" variant="secondary">Скинути фільтри</Button>
+        <Button href="/styleguide/" variant="secondary">Скинути фільтри</Button>
       </EmptyState>
     </Specimen>
   </Section>
@@ -405,7 +405,7 @@ const sampleFilterFields: FilterField[] = [
     <Specimen title="Текст" usage={'<Prose>…</Prose>'}>
       <Prose>
         <p>
-          Турклуб «Глобус» засновано в 1952 році при КПІ. Клуб <a href="/styleguide">відкритий для всіх</a>: вік і
+          Турклуб «Глобус» засновано в 1952 році при КПІ. Клуб <a href="/styleguide/">відкритий для всіх</a>: вік і
           «вузівська приналежність» не важливі.
         </p>
         <h2>Як ми ходимо в походи</h2>

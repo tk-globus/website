@@ -1,6 +1,6 @@
 ---
 // Стрічка новин: картки від нових до старих, по NEWS_PER_PAGE на сторінці.
-// Перша сторінка — /news, далі /news/2, /news/3… (paginate; адреси — pageHref з src/lib/pagination.ts).
+// Перша сторінка — /news/, далі /news/2/, /news/3/… (paginate; адреси — pageHref з src/lib/pagination.ts).
 import type { GetStaticPaths, Page } from 'astro';
 import BaseLayout from '../../layouts/BaseLayout.astro';
 import PageHeader from '../../components/PageHeader.astro';
@@ -25,14 +25,15 @@ const title = first ? 'Новини' : `Новини — сторінка ${page
   <PageHeader
     title="Новини"
     lead="Що відбувається в клубі: походи, тренування, клубні вечори й змагання."
-    breadcrumbs={first ? [{ label: 'Новини' }] : [{ label: 'Новини', href: '/news' }, { label: `Сторінка ${page.currentPage}` }]}
+    breadcrumbs={first ? [{ label: 'Новини' }] : [{ label: 'Новини', href: '/news/' }, { label: `Сторінка ${page.currentPage}` }]}
   />
   <Section>
     {
       page.data.length ? (
         <CardGrid columns={3}>
-          {page.data.map((entry) => (
+          {page.data.map((entry, i) => (
             <NewsCard
+              priority={i === 0}
               title={entry.data.title}
               href={newsHref(entry)}
               date={entry.data.date}
@@ -47,6 +48,6 @@ const title = first ? 'Новини' : `Новини — сторінка ${page
         <EmptyState headingLevel={2} title="Новин поки немає" />
       )
     }
-    <Pagination base="/news" current={page.currentPage} total={page.lastPage} label="Сторінки новин" />
+    <Pagination base="/news/" current={page.currentPage} total={page.lastPage} label="Сторінки новин" />
   </Section>
 </BaseLayout>

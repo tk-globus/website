@@ -1,6 +1,7 @@
 ---
 // Перемикач вигляду («Список / Календар»): кнопки показують одну з панелей ViewPanel тієї самої групи.
-// Вибір пишеться в адресу (`?view=calendar`), тож посилання відкриває той самий вигляд.
+// Вибір пишеться в адресу (`?view=calendar`), тож посилання відкриває той самий вигляд. Параметри адреси
+// схованої панелі (ViewPanel params, напр. `month` календаря) з адреси прибираються і повертаються з нею.
 // Без JavaScript перемикача не видно — показано першу панель (список).
 import Icon from './Icon.astro';
 import type { IconName } from '../lib/icons';
@@ -56,6 +57,8 @@ const { group, views, label, param = 'view' } = Astro.props;
     const buttons = [...root.querySelectorAll<HTMLButtonElement>('[data-view]')];
     const panels = [...document.querySelectorAll<HTMLElement>(`[data-view-group="${group}"]`)];
     const views = buttons.map((b) => b.dataset.view ?? '');
+    // Параметри адреси схованих панелей: назва → значення, щоб повернути, коли панель покажуть знову.
+    const stashed = new Map<string, string>();
 
     const show = (view: string, updateUrl: boolean) => {
       for (const panel of panels) panel.hidden = panel.dataset.viewPanel !== view;
@@ -64,6 +67,17 @@ const { group, views, label, param = 'view' } = Astro.props;
         const url = new URL(window.location.href);
         if (view === views[0]) url.searchParams.delete(param);
         else url.searchParams.set(param, view);
+        for (const panel of panels) {
+          for (const name of panel.dataset.viewParams?.split(' ') ?? []) {
+            const value = url.searchParams.get(name);
+            if (panel.hidden && value !== null) {
+              stashed.set(name, value);
+              url.searchParams.delete(name);
+            } else if (!panel.hidden && value === null && stashed.has(name)) {
+              url.searchParams.set(name, stashed.get(name)!);
+            }
+          }
+        }
         history.replaceState(history.state, '', url);
       }
     };

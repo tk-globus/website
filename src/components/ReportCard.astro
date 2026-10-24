@@ -23,9 +23,11 @@ interface Props {
   headingLevel?: 2 | 3;
   /** Значення для фільтрів бібліотеки (reportFilterValues). */
   filterValues?: FilterValues;
+  /** Перша картка списку — фото вантажиться одразу (Card priority). */
+  priority?: boolean;
 }
 
-const { title, href, kind, grade, regions = [], year, authors = [], route, image, imageAlt, headingLevel, filterValues } =
+const { title, href, kind, grade, regions = [], year, authors = [], route, image, imageAlt, headingLevel, filterValues, priority } =
   Astro.props;
 const footer = [year, authors.join(', ')].filter(Boolean).join(' · ');
 ---
@@ -35,7 +37,7 @@ const footer = [year, authors.join(', ')].filter(Boolean).join(' · ');
   data-filter-values={filterValues && JSON.stringify(filterValues)}
   class="grid"
 >
-  <Card title={title} href={href} description={route} image={image} imageAlt={imageAlt} headingLevel={headingLevel}>
+  <Card title={title} href={href} description={route} image={image} imageAlt={imageAlt} headingLevel={headingLevel} priority={priority}>
     <Fragment slot="meta">
       {regions.map((region) => <Tag>{region}</Tag>)}
       <Tag>{kind}</Tag>

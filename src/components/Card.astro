@@ -18,9 +18,14 @@ interface Props {
   headingLevel?: 2 | 3;
   /** Без фото — заглушка з кольорів теми замість порожнього місця. */
   placeholder?: boolean;
+  /**
+   * Фото видно одразу на першому екрані (перша картка списку): вантажити зразу й першим, а не ліниво.
+   * Інакше Lighthouse на телефоні бачить пізнє «найбільше зображення» (LCP).
+   */
+  priority?: boolean;
 }
 
-const { title, href, description, image, imageAlt = '', headingLevel = 3, placeholder = false } = Astro.props;
+const { title, href, description, image, imageAlt = '', headingLevel = 3, placeholder = false, priority = false } = Astro.props;
 const Heading = `h${headingLevel}` as const;
 ---
 
@@ -38,6 +43,7 @@ const Heading = `h${headingLevel}` as const;
         alt={imageAlt}
         widths={[...new Set([400, 800].map((w) => Math.min(w, image.width)))]}
         sizes="(min-width: 1024px) 24rem, (min-width: 640px) 50vw, 100vw"
+        priority={priority}
         class="aspect-3/2 w-full object-cover"
       />
     )

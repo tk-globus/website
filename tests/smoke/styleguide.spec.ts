@@ -6,7 +6,7 @@ const theme = readFileSync('src/styles/theme.css', 'utf8');
 const colorTokens = [...theme.matchAll(/^\s*--color-([a-z0-9-]+):/gm)].map((m) => m[1]);
 
 test('показує кожен колір із теми', async ({ page }) => {
-  await page.goto('/styleguide');
+  await page.goto('/styleguide/');
   const swatches = page.getByTestId('color-token');
   await expect(swatches).toHaveCount(colorTokens.length);
   for (const name of colorTokens) {
@@ -21,7 +21,7 @@ const allTokens = [...theme.matchAll(/^\s*(--[a-z0-9-]+):\s*([^;]+);/gm)]
   .map(([, name]) => name);
 
 test('показує кожен токен із теми', async ({ page }) => {
-  await page.goto('/styleguide');
+  await page.goto('/styleguide/');
   const shown = await page.locator('[data-token]').evaluateAll((els) => els.map((el) => el.getAttribute('data-token')));
   const missing = allTokens.filter((name) => !shown.includes(name));
   expect(missing, 'токени без показу на /styleguide').toEqual([]);
@@ -36,7 +36,7 @@ const components = readdirSync('src/components')
   .map((f) => f.replace('.astro', ''));
 
 test('має зразок кожного компонента', async ({ page }) => {
-  await page.goto('/styleguide');
+  await page.goto('/styleguide/');
   const missing: string[] = [];
   for (const name of components) {
     const scope = layoutParts.includes(name) ? page.locator('body') : page.locator('main');

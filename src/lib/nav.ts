@@ -1,4 +1,5 @@
-// Пункти меню шапки. href: null — сторінки ще немає (тікети 04–09):
+// Пункти меню шапки. Адреси сторінок — зі слешем у кінці (`/news/`): так їх віддає Cloudflare без редиректу.
+// href: null — сторінки ще немає (тікети 04–09):
 // пункт показується як текст без посилання, щоб не було битих посилань.
 export interface NavItem {
   label: string;
@@ -6,12 +7,12 @@ export interface NavItem {
 }
 
 export const mainNav: NavItem[] = [
-  { label: 'Про клуб', href: '/about' },
-  { label: 'Новини', href: '/news' },
-  { label: 'Події', href: '/events' },
-  { label: 'Бібліотека', href: '/library' },
-  { label: 'МКК', href: '/mkk' },
-  { label: 'Табір', href: '/camp' },
+  { label: 'Про клуб', href: '/about/' },
+  { label: 'Новини', href: '/news/' },
+  { label: 'Події', href: '/events/' },
+  { label: 'Бібліотека', href: '/library/' },
+  { label: 'МКК', href: '/mkk/' },
+  { label: 'Табір', href: '/camp/' },
 ];
 
-export const joinLink: NavItem = { label: 'Долучитися', href: '/join' };
+export const joinLink: NavItem = { label: 'Долучитися', href: '/join/' };

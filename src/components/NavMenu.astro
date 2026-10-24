@@ -9,7 +9,8 @@ interface Props {
 
 const { layout } = Astro.props;
 const current = Astro.url.pathname;
-const isCurrent = (href: string) => current === href || current.startsWith(`${href}/`);
+// Адреси зі слешем у кінці: `/news/` — поточний і для `/news/2/` та `/news/<новина>/`.
+const isCurrent = (href: string) => current.startsWith(href);
 ---
 
 <ul

@@ -30,13 +30,13 @@ const activities: Activity[] = [
     icon: 'book',
     title: 'Навчальні секції',
     text: 'Група А — для новачків, Група Б — для досвідчених туристів. Лекції, тренування й навчальні виїзди.',
-    href: '/join',
+    href: '/join/',
   },
   {
     icon: 'tent',
     title: 'Табір «Глобус»',
     text: 'Студентський табір у Карпатах неподалік Говерли і школа інструкторів при ньому.',
-    href: '/camp',
+    href: '/camp/',
   },
   {
     icon: 'flag',
@@ -92,7 +92,7 @@ const latestNews = (await getNews()).slice(0, 4);
   </Section>
 
   <Section title="Найближчі події" intro="Лекції, тренування, змагання й виїзди — приходьте.">
-    <Button slot="action" href="/events" variant="secondary" icon="arrow-right">Усі події</Button>
+    <Button slot="action" href="/events/" variant="secondary" icon="arrow-right">Усі події</Button>
     {
       upcomingEvents.length ? (
         <CardGrid columns={3}>
@@ -119,7 +119,7 @@ const latestNews = (await getNews()).slice(0, 4);
   </Section>
 
   <Section tone="surface" title="Останні новини" intro="Походи, тренування й клубні вечори — що відбувається в клубі.">
-    <Button slot="action" href="/news" variant="secondary" icon="arrow-right">Усі новини</Button>
+    <Button slot="action" href="/news/" variant="secondary" icon="arrow-right">Усі новини</Button>
     <CardGrid columns={4}>
       {
         latestNews.map((entry) => (
@@ -140,7 +140,7 @@ const latestNews = (await getNews()).slice(0, 4);
     title="Бібліотека звітів"
     intro={`${reportsCount(reports.length)} про походи учасників клубу — Карпати, Кавказ, Тянь-Шань, Памір: нитки маршрутів, фото й PDF.`}
   >
-    <Button slot="action" href="/library" variant="secondary" icon="arrow-right">Уся бібліотека</Button>
+    <Button slot="action" href="/library/" variant="secondary" icon="arrow-right">Уся бібліотека</Button>
     <CardGrid columns={3}>
       {
         reports.slice(0, 3).map((entry) => (

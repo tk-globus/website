@@ -22,8 +22,14 @@ const { Content } = await render(entry);
 const ogImage = cover ? await ogImageFrom(cover) : undefined;
 ---
 
-<BaseLayout title={title} description={description} image={ogImage} imageAlt={cover ? coverAlt || title : undefined}>
-  <PageHeader title={title} breadcrumbs={[{ label: 'Новини', href: '/news' }]}>
+<BaseLayout
+  title={title}
+  description={description}
+  type="article"
+  image={ogImage}
+  imageAlt={cover ? coverAlt || title : undefined}
+>
+  <PageHeader title={title} breadcrumbs={[{ label: 'Новини', href: '/news/' }]}>
     <time datetime={isoDate(date)}>{formatDate(date)}</time>
   </PageHeader>
   <Section>

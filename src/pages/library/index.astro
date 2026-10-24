@@ -41,9 +41,10 @@ const reports = await getReports();
           headingLevel={2}
         >
           <CardGrid columns={3}>
-            {reports.map((entry) => (
+            {reports.map((entry, i) => (
               <ReportCard
                 headingLevel={2}
+                priority={i === 0}
                 title={entry.data.title}
                 href={reportHref(entry)}
                 kind={entry.data.kind}

@@ -1,6 +1,7 @@
 ---
 // Сторінка звіту: метадані (район, вид, к.с., рік, автори, нитка маршруту…), файли звіту на старому сайті
 // з розміром (PDF не копіюємо — ADR 0004), опис і фото. Посилання на оригінал — щоб звірити з tkg.org.ua.
+// Превʼю посилання — назва, опис і обкладинка звіту (без обкладинки — /og.png з логотипом).
 import { Image } from 'astro:assets';
 import { render } from 'astro:content';
 import BaseLayout from '../../layouts/BaseLayout.astro';
@@ -12,6 +13,7 @@ import Button from '../../components/Button.astro';
 import Tag from '../../components/Tag.astro';
 import Prose from '../../components/Prose.astro';
 import { fileLabel, getReports, gradeLabel, type Report } from '../../lib/reports';
+import { ogImageFrom } from '../../lib/og-image';
 
 export async function getStaticPaths() {
   const reports = await getReports();
@@ -22,10 +24,17 @@ const { entry } = Astro.props as { entry: Report };
 const { title, kind, grade, regions = [], year, authors = [], route, countries, season, material, files = [] } = entry.data;
 const { cover, coverAlt, description, legacyUrl } = entry.data;
 const { Content } = await render(entry);
+const ogImage = cover ? await ogImageFrom(cover) : undefined;
 ---
 
-<BaseLayout title={title} description={description}>
-  <PageHeader title={title} breadcrumbs={[{ label: 'Бібліотека', href: '/library' }, { label: title }]}>
+<BaseLayout
+  title={title}
+  description={description}
+  type="article"
+  image={ogImage}
+  imageAlt={cover ? coverAlt || title : undefined}
+>
+  <PageHeader title={title} breadcrumbs={[{ label: 'Бібліотека', href: '/library/' }]}>
     <Cluster gap="sm">
       {regions.map((region) => <Tag>{region}</Tag>)}
       <Tag>{kind}</Tag>

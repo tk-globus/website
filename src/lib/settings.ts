@@ -33,8 +33,18 @@ const settingsSchema = z.object({
     email: channelText,
   }),
   address: z.string().min(1),
-  /** Контакт МКК для сторінки /mkk: загальна пошта, графік засідань і склад комісії (на старому сайті). */
+  /** Секція «Звʼязатися з клубом» на /about: заголовок і вступ над каналами клубу. */
+  contactSection: z.object({
+    title: z.string().min(1),
+    intro: z.string().min(1),
+  }),
+  /**
+   * Контакт МКК для сторінки /mkk: заголовок і вступ секції, загальна пошта, графік засідань і склад комісії
+   * (на старому сайті).
+   */
   mkk: z.object({
+    title: z.string().min(1),
+    intro: z.string().min(1),
     email: z.string().email(),
     schedule: z.string().url(),
     members: z.string().url(),

@@ -120,6 +120,18 @@ function linkName(text, url) {
   return isForm(url) ? 'Форма реєстрації' : 'Google-документ';
 }
 
+/**
+ * Назва події без дати в кінці й з українськими лапками (рішення Михайла, тікет 10): дата й так стоїть
+ * на картці й сторінці події. «Лекція "Орієнтування" - 19.10.2023» → «Лекція «Орієнтування»»;
+ * «Клубний вечір - 18.04.2024» → «Клубний вечір». Дата лише в кінці; рік у назві («Сніговий Барс 2025») лишається.
+ */
+export function cleanEventTitle(title) {
+  const t = cleanText(title)
+    .replace(/\s*[-–—]?\s*\d{1,2}\.\d{1,2}\.\d{4}\s*$/, '')
+    .replace(/"([^"]*)"/g, '«$1»');
+  return t || cleanText(title);
+}
+
 /** «Осінній лист 2026. Реєстрація команд» → «Реєстрація команд» (назва події в підписі зайва). */
 function bookPageName(title) {
   const t = cleanText(title);
@@ -155,7 +167,7 @@ export default {
       throw new Error('це не подія (немає класу node-type-event на body)');
     }
     const legacy = legacyUrl($, pageUrl);
-    const title = cleanText($('h1#page-title, h1.page__title').first().text());
+    const title = cleanEventTitle($('h1#page-title, h1.page__title').first().text());
     const article = $('article.node').first();
     const body = article.find('.field-name-body .field-item').first();
 

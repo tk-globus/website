@@ -6,9 +6,9 @@ import settings from '../../src/data/settings.json' with { type: 'json' };
 const OLD_SITE = 'https://www.tkg.org.ua/';
 
 for (const { label, href } of [
-  { label: 'Про клуб', href: '/about' },
-  { label: 'МКК', href: '/mkk' },
-  { label: 'Табір', href: '/camp' },
+  { label: 'Про клуб', href: '/about/' },
+  { label: 'МКК', href: '/mkk/' },
+  { label: 'Табір', href: '/camp/' },
 ]) {
   test(`пункт меню «${label}» веде на ${href}`, async ({ page }) => {
     await page.goto('/');
@@ -19,7 +19,7 @@ for (const { label, href } of [
 }
 
 test('/about: історія, напрями, адреса й дорога, карта, канали і старий форум', async ({ page }) => {
-  await page.goto('/about');
+  await page.goto('/about/');
   const main = page.getByRole('main');
   await expect(main).toContainText('1952');
   await expect(main.getByRole('heading', { level: 2, name: 'Напрями діяльності' })).toBeVisible();
@@ -36,7 +36,7 @@ test('/about: історія, напрями, адреса й дорога, ка
 });
 
 test('/mkk: FAQ, документи на старому сайті й контакт МКК', async ({ page }) => {
-  await page.goto('/mkk');
+  await page.goto('/mkk/');
   const main = page.getByRole('main');
   for (const name of ['Контакт МКК', 'Про МКК', 'FAQ', 'Для випуску в похід', 'Для захисту походу']) {
     await expect(main.getByRole('heading', { level: 2, name, exact: true })).toBeVisible();
@@ -56,7 +56,7 @@ test('/mkk: FAQ, документи на старому сайті й конта
 });
 
 test('/camp: табір «Глобус» і школа інструкторів', async ({ page }) => {
-  await page.goto('/camp');
+  await page.goto('/camp/');
   const main = page.getByRole('main');
   await expect(main.getByRole('heading', { level: 1 })).toContainText('Табір');
   await expect(main).toContainText('Говерли');
@@ -65,5 +65,5 @@ test('/camp: табір «Глобус» і школа інструкторів'
 
 test('головна: напрям «Табір «Глобус»» веде на /camp', async ({ page }) => {
   await page.goto('/');
-  await expect(page.getByRole('main').getByRole('link', { name: 'Табір «Глобус»' })).toHaveAttribute('href', '/camp');
+  await expect(page.getByRole('main').getByRole('link', { name: 'Табір «Глобус»' })).toHaveAttribute('href', '/camp/');
 });

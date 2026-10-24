@@ -6,7 +6,7 @@ import settings from '../../src/data/settings.json' with { type: 'json' };
 test('кнопка «Долучитися» на головній веде на /join, а там є посилання на Telegram-чат', async ({ page }) => {
   await page.goto('/');
   const join = page.getByRole('main').getByRole('link', { name: 'Долучитися' }).first();
-  await expect(join).toHaveAttribute('href', '/join');
+  await expect(join).toHaveAttribute('href', '/join/');
 
   await join.click();
   await expect(page).toHaveURL(/\/join\/?$/);
@@ -32,7 +32,7 @@ test('головна: хто ми, напрями й канали клубу', a
 });
 
 test('/join: куратори груп з налаштувань сайту', async ({ page }) => {
-  await page.goto('/join');
+  await page.goto('/join/');
   const main = page.getByRole('main');
   await expect(main).toContainText(`Куратор — ${settings.curators.groupA}`);
   await expect(main).toContainText(`Куратор — ${settings.curators.groupB}`);
@@ -50,7 +50,7 @@ test.describe('на телефоні', () => {
   });
 });
 
-for (const route of ['/', '/join']) {
+for (const route of ['/', '/join/']) {
   test(`${route}: превʼю для месенджерів (Open Graph, Twitter-картка)`, async ({ page, request }) => {
     await page.goto(route);
     const meta = (selector: string) => page.locator(`head meta[${selector}]`);

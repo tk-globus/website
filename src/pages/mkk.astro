@@ -1,7 +1,7 @@
 ---
 // /mkk — маршрутно-кваліфікаційна комісія: що це, як випуститися й захистити похід, FAQ і документи
 // (посилання на старий сайт). Текст — зі старого сайту (src/content/pages/mkk.md).
-// Контакт МКК (пошта, графік, склад) — з налаштувань сайту.
+// Контакт МКК (заголовок і вступ секції, пошта, графік, склад) — з налаштувань сайту.
 import { render } from 'astro:content';
 import BaseLayout from '../layouts/BaseLayout.astro';
 import Button from '../components/Button.astro';
@@ -20,11 +20,7 @@ const { mkk } = settings;
 
 <BaseLayout title={title} description={description}>
   <PageHeader title={title} breadcrumbs={[{ label: 'МКК' }]} />
-  <Section
-    tone="surface"
-    title="Контакт МКК"
-    intro="Запишіться на засідання за графіком роботи МКК і заздалегідь надішліть на пошту комісії район, нитку маршруту, дати й склад групи."
-  >
+  <Section tone="surface" title={mkk.title} intro={mkk.intro}>
     <Cluster>
       <Button href={`mailto:${mkk.email}`} icon="mail">{mkk.email}</Button>
       <Button href={mkk.schedule} variant="secondary" icon="calendar">Графік роботи МКК</Button>

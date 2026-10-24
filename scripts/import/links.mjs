@@ -1,6 +1,6 @@
 // Посилання на вже перенесені записи: адреса на старому сайті → адреса на новому.
 // Новини-анонси звітів («Опубліковано звіт про …») посилаються на звіт старого сайту — вузол /node/<nid>
-// або одразу на PDF. Якщо цей звіт уже імпортовано в бібліотеку, посилання веде на /library/<slug>,
+// або одразу на PDF. Якщо цей звіт уже імпортовано в бібліотеку, посилання веде на /library/<slug>/,
 // інакше лишається на старому сайті. Звіти шукаються за legacyUrl і за адресами їхніх файлів (`files`).
 //
 // Порядок імпорту: спершу звіти, потім новини. Імпортували звіти пізніше — перезапустіть імпорт новин
@@ -28,7 +28,7 @@ export function oldSiteKey(href) {
   return `www.tkg.org.ua${path}${url.search}`;
 }
 
-/** Звіти бібліотеки: ключ адреси на старому сайті (вузол звіту й кожен його файл) → `/library/<slug>`. */
+/** Звіти бібліотеки: ключ адреси на старому сайті (вузол звіту й кожен його файл) → `/library/<slug>/`. */
 export function libraryLinks(root) {
   const links = new Map();
   const dir = join(root, REPORTS_DIR);
@@ -36,7 +36,7 @@ export function libraryLinks(root) {
   for (const file of readdirSync(dir).filter((f) => f.endsWith('.md')).sort()) {
     const frontmatter = readFileSync(join(dir, file), 'utf8').match(/^---\r?\n([\s\S]*?)\r?\n---/)?.[1];
     const data = (frontmatter && YAML.parse(frontmatter)) || {};
-    const href = `/library/${file.slice(0, -3)}`;
+    const href = `/library/${file.slice(0, -3)}/`;
     for (const url of [data.legacyUrl, ...(data.files ?? []).map((f) => f.url)]) {
       const key = url && oldSiteKey(url);
       if (key && !links.has(key)) links.set(key, href);

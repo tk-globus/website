@@ -9,7 +9,10 @@
 // - мініатюру карти (`….thumbnail.png`) замінює оригіналом;
 // - дочірні сторінки розділу (навігація «книги» Drupal) додає списком посилань на старий сайт —
 //   у MVP переносимо лише головну сторінку розділу (аудит, розділ «Статичні сторінки»);
-// - посилання на інші перенесені сторінки (табір зі сторінки «Про клуб») веде на новий сайт.
+// - посилання на інші перенесені сторінки (табір зі сторінки «Про клуб») веде на новий сайт;
+// - застарілі посилання (графік МКК 2015/2016) замінює актуальними — див. UPDATED_LINKS;
+// - перелік у рядок («Потрапити туди можна: - від …; - від …») розбиває на список;
+// - підпис під фото, що повторює заголовок розділу («Розташування клубу» під картою), прибирає.
 import {
   OLD_SITE,
   absoluteUrl,
@@ -31,6 +34,14 @@ export const PAGES = [
 ];
 
 const PAGE_TYPES = ['node-type-page', 'node-type-book', 'node-type-story'];
+
+/**
+ * Застарілі посилання старого сайту → актуальні. Правити руками файл сторінки марно: наступний імпорт
+ * перезапише правку, тому заміна — тут.
+ * - FAQ МКК: «записуйтесь на засідання у темі про Графік роботи МКК» вело на графік 2015/2016 (/node/32954);
+ *   актуальний графік — /node/4765 (той самий, що `mkk.schedule` у src/data/settings.json).
+ */
+export const UPDATED_LINKS = new Map([[`${OLD_SITE}/node/32954`, `${OLD_SITE}/node/4765`]]);
 
 const slugByUrl = new Map(PAGES.map(({ slug, url }) => [url, slug]));
 
@@ -64,6 +75,31 @@ function linkEmails($, body) {
     }
   };
   walk(body.get(0));
+}
+
+/**
+ * Перелік, записаний одним абзацом («Потрапити туди можна: - від метро …; - від трамваю …»), → вступ і список.
+ * Абзац розбивається, лише якщо після двокрапки йдуть щонайменше два пункти « - », розділені «;».
+ */
+export function splitInlineLists($, body) {
+  body.find('p').each((_, p) => {
+    const parts = ($(p).html() ?? '').split(/(?<=[:;])\s+-\s+/);
+    if (parts.length < 3 || !parts[0].trimEnd().endsWith(':')) return;
+    if (!parts.slice(1, -1).every((part) => part.trimEnd().endsWith(';'))) return;
+    const list = $('<ul>');
+    for (const item of parts.slice(1)) list.append($('<li>').html(item.trim()));
+    $(p).html(parts[0].trim()).after(list);
+  });
+}
+
+/** Підпис під фото (`.caption`), що дослівно повторює заголовок свого розділу, — зайвий: прибираємо. */
+export function dropHeadingCaptions($, body) {
+  let heading = '';
+  body.find('h2, h3, .caption').each((_, el) => {
+    const text = cleanText($(el).text()).toLocaleLowerCase('uk');
+    if (!$(el).hasClass('caption')) heading = text;
+    else if (text && text === heading) $(el).remove();
+  });
 }
 
 export default {
@@ -116,6 +152,9 @@ export default {
       }
     });
 
+    dropHeadingCaptions($, body);
+    splitInlineLists($, body);
+
     // Пошта: `[at]` → `@`, адреса в тексті → посилання.
     body.find('a[href^="mailto:"]').each((_, a) => {
       $(a).attr('href', deobfuscate($(a).attr('href')));
@@ -142,10 +181,12 @@ export default {
     }
 
     prepareBody($, body);
-    // Посилання на перенесені сторінки — на новий сайт.
+    // Посилання на перенесені сторінки — на новий сайт; застарілі — на актуальні сторінки старого сайту.
     body.find('a[href]').each((_, a) => {
+      const updated = UPDATED_LINKS.get($(a).attr('href'));
+      if (updated) $(a).attr('href', updated);
       const slug = slugByUrl.get(withoutHash($(a).attr('href')));
-      if (slug) $(a).attr('href', `/${slug}`);
+      if (slug) $(a).attr('href', `/${slug}/`);
     });
     stripPresentation($, body);
     body.find('span').each((_, span) => {

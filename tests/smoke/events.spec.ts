@@ -29,7 +29,7 @@ const today = new Intl.DateTimeFormat('en-CA', { timeZone: 'Europe/Kyiv', year: 
 const lastDay = (e: EventFrontmatter) => (e.end ?? e.start).slice(0, 10);
 
 const events = eventRoutes
-  .map((path) => ({ ...frontmatter(path.replace('/events/', '')), path }))
+  .map((path) => ({ ...frontmatter(path.slice('/events/'.length, -1)), path }))
   .sort((a, b) => a.start.localeCompare(b.start) || nodeId(a.legacyUrl) - nodeId(b.legacyUrl));
 const upcoming = events.filter((e) => lastDay(e) >= today);
 const past = events.filter((e) => lastDay(e) < today).reverse();
@@ -55,7 +55,7 @@ test('пункт меню «Події» веде на /events', async ({ page }
 });
 
 test('/events: майбутні й минулі розділені правильно відносно поточної дати', async ({ page }) => {
-  await page.goto('/events');
+  await page.goto('/events/');
   const upcomingSection = section(page, 'Найближчі події');
   const pastSection = section(page, 'Минулі події');
 
@@ -75,7 +75,7 @@ test('/events: майбутні й минулі розділені правил�
 });
 
 test('/events: без вибору — список; перемикач показує календар і пише вигляд в адресу', async ({ page }) => {
-  await page.goto('/events');
+  await page.goto('/events/');
   const toggle = page.getByRole('group', { name: 'Вигляд подій' });
   const listButton = toggle.getByRole('button', { name: 'Список' });
   const calendarButton = toggle.getByRole('button', { name: 'Календар' });
@@ -108,7 +108,7 @@ const shiftMonth = (key: string, by: number) => {
 };
 
 test('календар: спочатку поточний місяць, кнопки гортають місяці, адреса відкриває той самий місяць', async ({ page }) => {
-  await page.goto('/events?view=calendar');
+  await page.goto('/events/?view=calendar');
   const visibleMonth = page.locator('[data-month]:visible');
   await expect(visibleMonth).toHaveCount(1);
   await expect(visibleMonth).toHaveAttribute('data-month', monthKey(today));
@@ -129,8 +129,29 @@ test('календар: спочатку поточний місяць, кноп
   );
 });
 
+test('календар: «сьогодні» і місяць, що відкривається, — з дати браузера, а не з дня збірки', async ({ page }) => {
+  // Браузер «живе» 10 жовтня 2026 (місяць є в календарі, бо в ньому «Осінній лист 2026»).
+  await page.clock.setFixedTime(new Date('2026-10-10T12:00:00+03:00'));
+  await page.goto('/events/?view=calendar');
+  const visibleMonth = page.locator('[data-month]:visible');
+  await expect(visibleMonth).toHaveAttribute('data-month', '2026-10');
+  await expect(page.locator('[aria-current="date"]')).toHaveCount(1);
+  await expect(visibleMonth.locator('[aria-current="date"]')).toHaveAttribute('data-date', '2026-10-10');
+  await expect(page.locator('[data-today]')).toHaveAttribute('data-date', '2026-10-10'); // видиме виділення — один день
+});
+
+test('календар: після повернення до списку в адресі немає ?month=, а календар памʼятає місяць', async ({ page }) => {
+  await page.goto('/events/?view=calendar&month=2026-10');
+  const toggle = page.getByRole('group', { name: 'Вигляд подій' });
+  await toggle.getByRole('button', { name: 'Список' }).click();
+  await expect(page).not.toHaveURL(/month=|view=/);
+  await toggle.getByRole('button', { name: 'Календар' }).click();
+  await expect(page).toHaveURL(/[?&]month=2026-10/);
+  await expect(page.locator('[data-month]:visible')).toHaveAttribute('data-month', '2026-10');
+});
+
 test('календар: кожна подія стоїть на своїх датах (багатоденна — у кожному дні)', async ({ page }) => {
-  await page.goto('/events');
+  await page.goto('/events/');
   const calendar = page.locator('[data-component="EventCalendar"]');
   for (const e of events) {
     for (let day = e.start.slice(0, 10); day <= lastDay(e); ) {
@@ -142,7 +163,7 @@ test('календар: кожна подія стоїть на своїх да�
   }
   // «Осінній лист 2026» — 25 жовтня, у місяці «Жовтень 2026».
   const autumn = events.find((e) => e.title.includes('Осінній лист 2026'))!;
-  await page.goto('/events?view=calendar&month=2026-10');
+  await page.goto('/events/?view=calendar&month=2026-10');
   const october = page.locator('[data-month="2026-10"]');
   await expect(october).toBeVisible();
   await expect(october.locator(`td[data-date="2026-10-25"] a[href="${autumn.path}"]`)).toBeVisible();
@@ -160,7 +181,7 @@ test('календар: кожна подія стоїть на своїх да�
 test('на телефоні календар показує список подій місяця', async ({ page }) => {
   await page.setViewportSize({ width: 360, height: 740 });
   const e = events[events.length - 1];
-  await page.goto(`/events?view=calendar&month=${monthKey(e.start)}`);
+  await page.goto(`/events/?view=calendar&month=${monthKey(e.start)}`);
   const month = page.locator(`[data-month="${monthKey(e.start)}"]`);
   await expect(month.getByRole('heading', { name: 'Події місяця' })).toBeVisible();
   await expect(month.getByRole('link', { name: e.title, exact: true })).toBeVisible();
@@ -169,7 +190,7 @@ test('на телефоні календар показує список под�
 test('головна: блок «Найближчі події» — до трьох найближчих або порожній стан', async ({ page }) => {
   await page.goto('/');
   const block = section(page, 'Найближчі події');
-  await expect(block.getByRole('link', { name: 'Усі події' })).toHaveAttribute('href', '/events');
+  await expect(block.getByRole('link', { name: 'Усі події' })).toHaveAttribute('href', '/events/');
   expect(await cardLinks(block)).toEqual(upcoming.slice(0, 3).map((e) => e.path));
   if (!upcoming.length) {
     await expect(block.locator('[data-component="EmptyState"]')).toContainText('Найближчих подій поки немає');
@@ -180,6 +201,9 @@ for (const e of events) {
   test(`${e.path}: дата, місце, посилання, опис і оригінал`, async ({ page }) => {
     await page.goto(e.path);
     await expect(page.getByRole('heading', { level: 1 })).toHaveText(e.title);
+    // Хлібні крихти: «Головна › Події», назва події — лише в h1.
+    const crumbs = page.getByRole('navigation', { name: 'Хлібні крихти' });
+    await expect(crumbs.getByRole('listitem')).toHaveText(['Головна', 'Події']);
     await expect(page.locator('main [data-component="Tag"]').first()).toHaveText(
       lastDay(e) >= today ? 'Майбутня подія' : 'Минула подія',
     );

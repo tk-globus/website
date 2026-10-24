@@ -41,7 +41,7 @@ test('анонс звіту: звіт уже в бібліотеці — пос�
   addReport(root, 'zvit-2-k-s-karpaty', 'title: Звіт\nlegacyUrl: https://www.tkg.org.ua/node/37933');
   const { failed } = await runImport(type, { root, fetcher });
   assert.deepEqual(failed, []);
-  assert.match(body(root), /\[пішохідний похід 2 к\.с\. Українськими Карпатами\]\(\/library\/zvit-2-k-s-karpaty\)/);
+  assert.match(body(root), /\[пішохідний похід 2 к\.с\. Українськими Карпатами\]\(\/library\/zvit-2-k-s-karpaty\/\)/);
   assert.doesNotMatch(body(root), /node\/37933|23 MB/);
 });
 
@@ -60,12 +60,12 @@ test('звіт знаходиться і за адресою вузла, і за
     'title: Звіт\nfiles:\n  - name: a.pdf\n    url: https://www.tkg.org.ua/files/a.pdf\nlegacyUrl: https://www.tkg.org.ua/node/5',
   );
   const links = libraryLinks(root);
-  assert.equal(links.get(oldSiteKey('http://tkg.org.ua/node/5/#top')), '/library/zvit');
-  assert.equal(links.get(oldSiteKey('https://www.tkg.org.ua/files/a.pdf')), '/library/zvit');
+  assert.equal(links.get(oldSiteKey('http://tkg.org.ua/node/5/#top')), '/library/zvit/');
+  assert.equal(links.get(oldSiteKey('https://www.tkg.org.ua/files/a.pdf')), '/library/zvit/');
   assert.equal(oldSiteKey('https://example.com/node/5'), null);
   assert.equal(
     rewriteLinks('<p><a href="https://www.tkg.org.ua/files/a.pdf" title="4 MB">звіт</a> і <a href="https://youtu.be/x">відео</a></p>', links),
-    '<p><a href="/library/zvit">звіт</a> і <a href="https://youtu.be/x">відео</a></p>',
+    '<p><a href="/library/zvit/">звіт</a> і <a href="https://youtu.be/x">відео</a></p>',
   );
   assert.equal(libraryLinks(join(root, 'nema')).size, 0, 'немає теки звітів — немає й посилань');
 });

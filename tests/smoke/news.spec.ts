@@ -22,7 +22,7 @@ const nodeId = (legacyUrl: string) => Number(legacyUrl.match(/\/node\/(\d+)/)?.[
 
 // Порядок — як на сайті (src/lib/news.ts): новіші вище, новини одного дня — за номером вузла (пізніший вище).
 const news = newsRoutes
-  .map((route) => ({ route, ...frontmatter(route.replace('/news/', '')) }))
+  .map((route) => ({ route, ...frontmatter(route.slice('/news/'.length, -1)) }))
   .sort((a, b) => b.date.localeCompare(a.date) || nodeId(b.legacyUrl) - nodeId(a.legacyUrl));
 
 /** Новини на сторінці стрічки: адреса й дата кожної картки в порядку показу. */
@@ -95,7 +95,7 @@ for (const { route, title, date, cover, legacyUrl } of news) {
     // Хлібні крихти: «Головна › Новини», назва — лише в заголовку h1, не двічі поспіль.
     const crumbs = page.getByRole('navigation', { name: 'Хлібні крихти' });
     await expect(crumbs.getByRole('listitem')).toHaveText(['Головна', 'Новини']);
-    await expect(crumbs.getByRole('link', { name: 'Новини' })).toHaveAttribute('href', '/news');
+    await expect(crumbs.getByRole('link', { name: 'Новини' })).toHaveAttribute('href', '/news/');
     await expect(crumbs).not.toContainText(title);
   });
 }
@@ -135,7 +135,7 @@ for (const { route, title, cover } of news.filter((n) => n.cover)) {
 
 test('анонс звіту веде на сторінку звіту в бібліотеці', async ({ page }) => {
   const announcements = news.filter(({ route }) =>
-    readFileSync(`src/content/news/${route.replace('/news/', '')}.md`, 'utf8').includes('](/library/'),
+    readFileSync(`src/content/news/${route.slice('/news/'.length, -1)}.md`, 'utf8').includes('](/library/'),
   );
   expect(announcements.length, 'новини-анонси звітів, імпортованих у бібліотеку').toBeGreaterThan(0);
   await page.goto(announcements[0].route);
@@ -147,7 +147,7 @@ test('анонс звіту веде на сторінку звіту в біб�
 test('головна: блок «Останні новини» — 3–4 свіжі картки, «Усі новини», клік відкриває новину', async ({ page }) => {
   await page.goto('/');
   const block = page.locator('section', { has: page.getByRole('heading', { level: 2, name: 'Останні новини' }) });
-  await expect(block.getByRole('link', { name: 'Усі новини' })).toHaveAttribute('href', '/news');
+  await expect(block.getByRole('link', { name: 'Усі новини' })).toHaveAttribute('href', '/news/');
   const cards = block.locator('[data-component="NewsCard"]');
   const count = await cards.count();
   expect(count).toBeGreaterThanOrEqual(Math.min(3, news.length));

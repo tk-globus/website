@@ -3,6 +3,8 @@
 // кнопки «попередній / наступний місяць». Видно один місяць; спочатку — поточний (за київським часом),
 // або той, що в адресі (`?month=2026-10`), — посилання відкриває той самий місяць.
 // На телефоні назв у клітинках не видно (лише позначка), а під сіткою — список подій місяця.
+// «Сьогодні» (виділений день) і місяць, що відкривається, скрипт бере з дати браузера (за Києвом), а не з дня
+// збірки: так вони збігаються, навіть якщо сайт давно не перезбирали. Без JavaScript — день збірки.
 // Дані — calendarMonths() з src/lib/events.ts.
 import Icon from './Icon.astro';
 import type { CalendarMonth } from '../lib/events';
@@ -35,7 +37,7 @@ const navButton =
   {
     months.map((month) => (
       <section data-month={month.key} aria-labelledby={`calendar-${month.key}`} hidden={month.key !== initial}>
-        <div class="mb-4 flex items-center justify-between gap-4">
+        <div class="mb-4 flex items-center justify-between gap-2 sm:gap-4">
           <button
             type="button"
             class={navButton}
@@ -45,7 +47,7 @@ const navButton =
           >
             <Icon name="chevron-left" size={20} />
           </button>
-          <Heading id={`calendar-${month.key}`} tabindex="-1" class="text-center text-2xl font-bold text-ink">
+          <Heading id={`calendar-${month.key}`} tabindex="-1" class="text-center text-xl font-bold text-ink sm:text-2xl">
             {month.label}
           </Heading>
           <button
@@ -77,17 +79,18 @@ const navButton =
                 {week.map((day) => (
                   <td
                     data-date={day.date}
+                    data-today={day.isToday ? '' : undefined}
                     aria-current={day.isToday ? 'date' : undefined}
                     class:list={[
-                      'h-14 border border-line/soft p-1 align-top sm:h-28 sm:p-2',
+                      'group h-14 border border-line/soft p-1 align-top sm:h-28 sm:p-2',
                       day.inMonth ? 'bg-paper' : 'bg-surface',
                     ]}
                   >
                     <span
                       class:list={[
                         'flex size-7 items-center justify-center rounded-full text-sm',
-                        day.isToday && 'bg-brand font-bold text-on-brand',
-                        !day.isToday && (day.inMonth ? 'text-ink' : 'text-muted'),
+                        'group-data-today:bg-brand group-data-today:font-bold group-data-today:text-on-brand',
+                        day.inMonth ? 'text-ink' : 'text-muted',
                       ]}
                     >
                       {day.day}
@@ -142,14 +145,26 @@ const navButton =
 <script>
   // Показує один місяць; кнопки гортають місяці. Спочатку — місяць з адреси (?month=) або поточний за Києвом
   // (якщо він поза календарем — найближчий крайній). Гортання пише місяць в адресу (replaceState).
-  const monthNow = new Intl.DateTimeFormat('en-CA', { timeZone: 'Europe/Kyiv', year: 'numeric', month: '2-digit' })
-    .format(new Date())
-    .slice(0, 7);
+  // «Сьогодні» — теж за датою браузера (за Києвом), щоб виділений день і відкритий місяць не розходилися.
+  const today = new Intl.DateTimeFormat('en-CA', {
+    timeZone: 'Europe/Kyiv',
+    year: 'numeric',
+    month: '2-digit',
+    day: '2-digit',
+  }).format(new Date());
+  const monthNow = today.slice(0, 7);
 
   for (const calendar of document.querySelectorAll<HTMLElement>('[data-event-calendar]')) {
     const months = [...calendar.querySelectorAll<HTMLElement>('[data-month]')];
     const keys = months.map((m) => m.dataset.month ?? '');
     if (!keys.length) continue;
+
+    for (const cell of calendar.querySelectorAll<HTMLElement>('td[data-date]')) {
+      const isToday = cell.dataset.date === today;
+      cell.toggleAttribute('data-today', isToday);
+      if (isToday) cell.setAttribute('aria-current', 'date');
+      else cell.removeAttribute('aria-current');
+    }
 
     const show = (key: string, updateUrl: boolean) => {
       for (const month of months) month.hidden = month.dataset.month !== key;

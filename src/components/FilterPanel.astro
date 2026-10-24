@@ -147,7 +147,9 @@ const fieldsId = `${id}-fields`;
 
     const fromUrl = selectionFromSearch(window.location.search, fields);
     for (const select of selects) select.value = fromUrl[select.name] ?? '';
-    apply(false);
+    // Невідомі значення фільтрів в адресі (`?region=Марс`) ігноруються — і з адреси теж прибираються.
+    const search = window.location.search;
+    apply(searchWithSelection(search, fields, fromUrl) !== (search === '?' ? '' : search));
     form.hidden = false;
 
     form.addEventListener('change', () => apply(true));
