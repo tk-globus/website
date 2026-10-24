@@ -1,0 +1,70 @@
+---
+// Сторінка події: дата й час, місце, посилання (реєстрація, умови), обкладинка й опис.
+// Посилання на оригінал — щоб звірити з tkg.org.ua.
+import { Image } from 'astro:assets';
+import { render } from 'astro:content';
+import BaseLayout from '../../layouts/BaseLayout.astro';
+import PageHeader from '../../components/PageHeader.astro';
+import Section from '../../components/Section.astro';
+import Facts from '../../components/Facts.astro';
+import Cluster from '../../components/Cluster.astro';
+import Button from '../../components/Button.astro';
+import Tag from '../../components/Tag.astro';
+import Prose from '../../components/Prose.astro';
+import { formatWhen, getEvents, isUpcoming, type ClubEvent } from '../../lib/events';
+
+export async function getStaticPaths() {
+  const events = await getEvents();
+  return events.map((entry) => ({ params: { slug: entry.id }, props: { entry } }));
+}
+
+const { entry } = Astro.props as { entry: ClubEvent };
+const { title, start, end, location, cover, coverAlt, description, links = [], legacyUrl } = entry.data;
+const upcoming = isUpcoming(entry);
+const { Content } = await render(entry);
+---
+
+<BaseLayout title={title} description={description}>
+  <PageHeader title={title} breadcrumbs={[{ label: 'Події', href: '/events' }, { label: title }]}>
+    <Cluster gap="sm">
+      <Tag tone={upcoming ? 'accent' : 'neutral'}>{upcoming ? 'Майбутня подія' : 'Минула подія'}</Tag>
+    </Cluster>
+  </PageHeader>
+  <Section>
+    <Facts
+      items={[
+        { label: 'Дата й час', value: formatWhen(start, end), datetime: start },
+        { label: 'Місце', value: location },
+      ]}
+    />
+  </Section>
+  {
+    links.length > 0 && (
+      <Section tone="surface" title="Посилання" intro="Реєстрація, умови й документи події.">
+        <Cluster>
+          {links.map((link, i) => (
+            <Button href={link.url} variant={i === 0 ? 'primary' : 'secondary'} icon="arrow-right">
+              {link.name}
+            </Button>
+          ))}
+        </Cluster>
+      </Section>
+    )
+  }
+  <Section title="Опис">
+    <Prose>
+      {
+        cover && (
+          <Image
+            src={cover}
+            alt={coverAlt ?? ''}
+            widths={[...new Set([400, 800, 1200].map((w) => Math.min(w, cover.width)))]}
+            sizes="(min-width: 48rem) 42rem, 100vw"
+          />
+        )
+      }
+      <Content />
+      <p><a href={legacyUrl}>Оригінал на старому сайті</a></p>
+    </Prose>
+  </Section>
+</BaseLayout>

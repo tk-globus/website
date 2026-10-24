@@ -16,3 +16,7 @@ export const routes = ['/', '/join', '/styleguide', '/news', ...newsRoutes, '/li
 
 // Статичні сторінки (тікет 09).
 routes.push('/about', '/mkk', '/camp');
+
+// Події (тікет 06): список і календар, сторінка кожної події.
+export const eventRoutes = slugs('events').map((slug) => `/events/${slug}`);
+routes.push('/events', ...eventRoutes);
