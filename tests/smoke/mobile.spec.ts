@@ -1,4 +1,4 @@
-// Телефон: немає горизонтального скролу, меню згорнуте під кнопку й відкривається.
+// Телефон: немає горизонтального скролу (320 і 360 px), меню згорнуте під кнопку й відкривається.
 // Найвужчий телефон (320 px): відкрите меню теж не дає скролу, кнопка «Закрити» не виходить за край.
 import { test, expect } from '@playwright/test';
 import settings from '../../src/data/settings.json' with { type: 'json' };
@@ -6,14 +6,19 @@ import { routes } from './routes';
 
 test.use({ viewport: { width: 360, height: 740 } });
 
-for (const route of [...routes, '/takoyi-storinky-nemaye']) {
-  test(`${route}: на телефоні немає горизонтального скролу`, async ({ page }) => {
+// Найвужчий телефон (320 px) і типовий (360 px): переповнення на 320 px тест на 360 px не бачить (знахідка 07).
+for (const route of [...routes, '/takoyi-storinky-nemaye/']) {
+  test(`${route}: на телефоні (320 і 360 px) немає горизонтального скролу`, async ({ page }) => {
+    await page.setViewportSize({ width: 320, height: 640 });
     await page.goto(route);
-    const { scrollWidth, clientWidth } = await page.evaluate(() => ({
-      scrollWidth: document.documentElement.scrollWidth,
-      clientWidth: document.documentElement.clientWidth,
-    }));
-    expect(scrollWidth).toBeLessThanOrEqual(clientWidth);
+    for (const width of [320, 360]) {
+      await page.setViewportSize({ width, height: 640 });
+      const { scrollWidth, clientWidth } = await page.evaluate(() => ({
+        scrollWidth: document.documentElement.scrollWidth,
+        clientWidth: document.documentElement.clientWidth,
+      }));
+      expect(scrollWidth, `ширина ${width} px`).toBeLessThanOrEqual(clientWidth);
+    }
   });
 }
 

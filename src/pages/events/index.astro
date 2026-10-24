@@ -89,7 +89,7 @@ const months = calendarMonths(events.map(calendarItem), today);
     </Section>
   </ViewPanel>
 
-  <ViewPanel group="events" view="calendar">
+  <ViewPanel group="events" view="calendar" params={['month']}>
     <Section>
       <EventCalendar months={months} initial={currentMonthKey(today)} />
     </Section>

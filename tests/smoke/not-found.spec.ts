@@ -1,9 +1,11 @@
 // Неіснуюча адреса: сторінка «не знайдено» в стилі сайту і статус 404 (а не головна з 200).
+// Адреса зі слешем: локальний `astro preview` (trailingSlash: 'always') на адресу без слеша показує власну
+// службову 404; Cloudflare в обох випадках віддає нашу 404.html — це перевіряє npm run check:live.
 import { test, expect } from '@playwright/test';
 import settings from '../../src/data/settings.json' with { type: 'json' };
 
 test('неіснуюча адреса віддає 404 зі сторінкою «не знайдено»', async ({ page }) => {
-  const response = await page.goto('/takoyi-storinky-nemaye');
+  const response = await page.goto('/takoyi-storinky-nemaye/');
   expect(response?.status()).toBe(404);
 
   await expect(page.getByRole('heading', { level: 1, name: 'Сторінку не знайдено' })).toBeVisible();

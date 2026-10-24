@@ -1,6 +1,6 @@
 ---
 // Сторінка події: дата й час, місце, посилання (реєстрація, умови), обкладинка й опис.
-// Посилання на оригінал — щоб звірити з tkg.org.ua.
+// Посилання на оригінал — щоб звірити з tkg.org.ua. Превʼю посилання — з обкладинки події (без неї — /og.png).
 import { Image } from 'astro:assets';
 import { render } from 'astro:content';
 import BaseLayout from '../../layouts/BaseLayout.astro';
@@ -12,6 +12,7 @@ import Button from '../../components/Button.astro';
 import Tag from '../../components/Tag.astro';
 import Prose from '../../components/Prose.astro';
 import { formatWhen, getEvents, isUpcoming, type ClubEvent } from '../../lib/events';
+import { ogImageFrom } from '../../lib/og-image';
 
 export async function getStaticPaths() {
   const events = await getEvents();
@@ -22,10 +23,11 @@ const { entry } = Astro.props as { entry: ClubEvent };
 const { title, start, end, location, cover, coverAlt, description, links = [], legacyUrl } = entry.data;
 const upcoming = isUpcoming(entry);
 const { Content } = await render(entry);
+const ogImage = cover ? await ogImageFrom(cover) : undefined;
 ---
 
-<BaseLayout title={title} description={description}>
-  <PageHeader title={title} breadcrumbs={[{ label: 'Події', href: '/events' }, { label: title }]}>
+<BaseLayout title={title} description={description} image={ogImage} imageAlt={cover ? coverAlt || title : undefined}>
+  <PageHeader title={title} breadcrumbs={[{ label: 'Події', href: '/events/' }]}>
     <Cluster gap="sm">
       <Tag tone={upcoming ? 'accent' : 'neutral'}>{upcoming ? 'Майбутня подія' : 'Минула подія'}</Tag>
     </Cluster>

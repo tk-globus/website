@@ -212,6 +212,14 @@ test('нитка маршруту: якщо на сторінці немає spa
   assert.match(data.route, /^Вдсп\. Шипот – хр\. Полонина Боржава – .* – Буковель \(с\.Паляниця\)$/);
 });
 
+test('нитки немає ні на сторінці, ні в списку /trip_search — попередження, а не тиша', () => {
+  const noRoute = REPORT.replace(/<span class="route">([\s\S]*?)<\/span>/, '$1');
+  // Адреса, якої немає в жодному списку: запасна нитка (стан модуля) для неї не знайдеться.
+  const parsed = reports.parse(noRoute, 'https://www.tkg.org.ua/node/1');
+  assert.equal(parsed.data.route, undefined);
+  assert.ok(parsed.warnings.some((w) => w.startsWith('без нитки маршруту')), parsed.warnings.join('; '));
+});
+
 test('колонка «опис» /trip_search — нитка, лише якщо схожа на маршрут', () => {
   assert.equal(routeFromListText('ст. Баликсу - р. Теренсу - п. Геологов (н/к)'), 'ст. Баликсу - р. Теренсу - п. Геологов (н/к)');
   assert.equal(routeFromListText('Звіт про похід по Норвегії. Маршрут: Turtargø — Nedre Liagrø — Liaflui'), 'Turtargø — Nedre Liagrø — Liaflui');

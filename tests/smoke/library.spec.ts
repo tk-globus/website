@@ -26,7 +26,7 @@ const nodeId = (url: string) => Number(url.match(/\/node\/(\d+)/)?.[1] ?? 0);
 
 // Порядок, як на сторінці: рік (без року — у кінці), далі номер вузла старого сайту.
 const reports = reportRoutes
-  .map((path) => ({ ...frontmatter(path.replace('/library/', '')), path }))
+  .map((path) => ({ ...frontmatter(path.slice('/library/'.length, -1)), path }))
   .sort((a, b) => (b.year ?? 0) - (a.year ?? 0) || nodeId(b.legacyUrl) - nodeId(a.legacyUrl));
 
 const gradeLabel = (grade: string) => (grade === 'н/к' ? grade : `${grade} к.с.`);
@@ -40,7 +40,7 @@ test('пункт меню «Бібліотека» веде на /library', asyn
 
 test('/library: усі звіти в картках, найсвіжіші — першими', async ({ page }) => {
   expect(reports.length, 'імпортовані звіти').toBe(44);
-  await page.goto('/library');
+  await page.goto('/library/');
   const cards = page.getByRole('main').locator('[data-component="ReportCard"]');
   await expect(cards).toHaveCount(reports.length);
   const titles = await cards.getByRole('heading', { level: 2 }).allInnerTexts();
@@ -61,7 +61,7 @@ test('/library: усі звіти в картках, найсвіжіші — п
 test('головна: блок-вхід у бібліотеку з найсвіжішими звітами', async ({ page }) => {
   await page.goto('/');
   const block = page.getByRole('main').locator('section', { has: page.getByRole('heading', { level: 2, name: 'Бібліотека звітів' }) });
-  await expect(block.getByRole('link', { name: 'Уся бібліотека' })).toHaveAttribute('href', '/library');
+  await expect(block.getByRole('link', { name: 'Уся бібліотека' })).toHaveAttribute('href', '/library/');
   await expect(block).toContainText(`${reports.length} звіт`);
   const titles = await block.locator('[data-component="ReportCard"]').getByRole('heading', { level: 3 }).allInnerTexts();
   expect(titles).toEqual(reports.slice(0, 3).map((r) => r.title));
@@ -71,6 +71,10 @@ for (const r of reports) {
   test(`${r.path}: метадані, опис, файл і посилання на оригінал`, async ({ page }) => {
     await page.goto(r.path);
     await expect(page.getByRole('heading', { level: 1 })).toHaveText(r.title);
+    // Хлібні крихти: «Головна › Бібліотека», назва звіту — лише в h1, не двічі поспіль.
+    const crumbs = page.getByRole('navigation', { name: 'Хлібні крихти' });
+    await expect(crumbs.getByRole('listitem')).toHaveText(['Головна', 'Бібліотека']);
+    await expect(crumbs.getByRole('link', { name: 'Бібліотека' })).toHaveAttribute('href', '/library/');
 
     const facts = page.locator('[data-component="Facts"]');
     await expect(facts).toContainText(r.kind);

@@ -41,7 +41,7 @@ export function splitEvents(events: ClubEvent[], today = todayInKyiv()) {
   return { upcoming, past };
 }
 
-export const eventHref = (entry: ClubEvent) => `/events/${entry.id}`;
+export const eventHref = (entry: ClubEvent) => `/events/${entry.id}/`;
 
 /**
  * «25 жовтня 2026, 08:00»; той самий день — «2 квітня 2025, 19:00–21:00»;

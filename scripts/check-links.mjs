@@ -1,6 +1,8 @@
 #!/usr/bin/env node
 // Перевірка внутрішніх посилань у зібраному сайті (dist/): кожне href/src усередині сайту
 // має вести на існуючий файл. Зовнішні посилання не перевіряються.
+// Посилання на сторінку (не файл) — зі слешем у кінці (`/news/`, `/news/?page`): адреса без слеша
+// на Cloudflare дає зайвий редирект 308 (знахідка перевірки 05a). Такі посилання — теж помилка.
 //
 // Використання: node scripts/check-links.mjs [тека збірки]   (за замовчуванням — dist)
 import { existsSync, readdirSync, readFileSync, statSync } from 'node:fs';
@@ -34,6 +36,13 @@ function isInternal(url) {
   return url !== '' && !/^(?:[a-z][a-z0-9+.-]*:|\/\/|#)/i.test(url);
 }
 
+/** Посилання на сторінку без слеша в кінці (`/join`, `../news?x`): шлях без розширення файлу. */
+function missingSlash(url) {
+  const path = url.split(/[?#]/)[0];
+  if (!path || path.endsWith('/')) return false;
+  return !/\.[a-z0-9]+$/i.test(path.split('/').pop());
+}
+
 function targetExists(fromFile, url) {
   const path = decodeURIComponent(url.split(/[?#]/)[0]);
   const base = path.startsWith('/') ? join(root, path) : resolve(dirname(fromFile), path);
@@ -42,6 +51,7 @@ function targetExists(fromFile, url) {
 }
 
 const broken = [];
+const noSlash = [];
 let checked = 0;
 for (const file of htmlFiles(root)) {
   const html = readFileSync(file, 'utf8');
@@ -49,12 +59,17 @@ for (const file of htmlFiles(root)) {
     if (!isInternal(url)) continue;
     checked++;
     if (!targetExists(file, url)) broken.push(`${relative(root, file)} → ${url}`);
+    else if (missingSlash(url)) noSlash.push(`${relative(root, file)} → ${url}`);
   }
 }
 
 if (broken.length) {
   console.error(`Биті внутрішні посилання (${broken.length}):`);
   for (const b of broken) console.error(`  ${b}`);
-  process.exit(1);
 }
+if (noSlash.length) {
+  console.error(`Посилання на сторінку без слеша в кінці (${noSlash.length}) — на Cloudflare це редирект 308, пишіть /адреса/:`);
+  for (const b of noSlash) console.error(`  ${b}`);
+}
+if (broken.length || noSlash.length) process.exit(1);
 console.log(`Внутрішні посилання: перевірено ${checked}, битих немає.`);

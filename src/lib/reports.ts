@@ -14,7 +14,7 @@ export async function getReports(): Promise<Report[]> {
   return reports.sort((a, b) => (b.data.year ?? 0) - (a.data.year ?? 0) || nodeId(b) - nodeId(a));
 }
 
-export const reportHref = (entry: Report) => `/library/${entry.id}`;
+export const reportHref = (entry: Report) => `/library/${entry.id}/`;
 
 /** «2» → «2 к.с.», «н/к» — як є. */
 export const gradeLabel = (grade: ReportGrade) => (grade === 'н/к' ? grade : `${grade} к.с.`);

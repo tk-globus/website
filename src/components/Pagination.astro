@@ -1,12 +1,12 @@
 ---
 // Пагінація стрічки: «Попередня», номери сторінок, «Наступна». Поточна сторінка — без посилання
-// (aria-current="page"). Адреси сторінок — pageHref() з src/lib/pagination.ts (`/news`, `/news/2`…).
+// (aria-current="page"). Адреси сторінок — pageHref() з src/lib/pagination.ts (`/news/`, `/news/2/`…).
 // Одна сторінка — пагінації немає (компонент нічого не показує).
 import Icon from './Icon.astro';
 import { pageHref } from '../lib/pagination';
 
 interface Props {
-  /** Адреса першої сторінки стрічки (`/news`). */
+  /** Адреса першої сторінки стрічки (`/news/`). */
   base: string;
   current: number;
   total: number;

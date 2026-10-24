@@ -3,7 +3,7 @@
 import { test, expect } from '@playwright/test';
 import { routes } from './routes';
 
-for (const route of [...routes, '/takoyi-storinky-nemaye']) {
+for (const route of [...routes, '/takoyi-storinky-nemaye/']) {
   test(`${route}: заголовки по порядку`, async ({ page }) => {
     await page.goto(route);
     const headings = await page

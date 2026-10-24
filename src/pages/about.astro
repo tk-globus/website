@@ -1,6 +1,6 @@
 ---
 // /about — «Про клуб»: історія, напрями діяльності, розташування й дорога до клубу. Текст — зі старого сайту
-// (src/content/pages/about.md). Нижче — канали клубу і старий форум (адреси — з налаштувань сайту).
+// (src/content/pages/about.md). Нижче — канали клубу і старий форум (адреси й тексти секції — з налаштувань сайту).
 import { render } from 'astro:content';
 import BaseLayout from '../layouts/BaseLayout.astro';
 import Button from '../components/Button.astro';
@@ -24,11 +24,7 @@ const { Content } = await render(page);
       <p><a href={legacyUrl}>Оригінал на старому сайті</a></p>
     </Prose>
   </Section>
-  <Section
-    tone="surface"
-    title="Звʼязатися з клубом"
-    intro="Найшвидше — у Telegram-чаті клубу. Старий форум лишається архівом обговорень."
-  >
+  <Section tone="surface" title={settings.contactSection.title} intro={settings.contactSection.intro}>
     <Button slot="action" href={settings.channels.forum} variant="secondary" icon="message">Старий форум</Button>
     <Channels />
   </Section>

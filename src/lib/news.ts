@@ -10,4 +10,4 @@ export async function getNews(): Promise<News[]> {
   return news.sort((a, b) => b.data.date.valueOf() - a.data.date.valueOf() || nodeId(b) - nodeId(a));
 }
 
-export const newsHref = (entry: News) => `/news/${entry.id}`;
+export const newsHref = (entry: News) => `/news/${entry.id}/`;

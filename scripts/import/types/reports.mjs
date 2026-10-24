@@ -98,7 +98,12 @@ export function normalizeAuthor(value) {
 
 /**
  * Нитка маршруту з колонки «опис» таблиці `/trip_search`: адреса звіту → текст. Запасне джерело для звітів,
- * де на сторінці немає `span.route`. Заповнюють sampleUrls (з вибірки) і parseTripSearch (з таблиці).
+ * де на сторінці немає `span.route`.
+ *
+ * Увага: це стан модуля, спільний для одного запуску імпортера. Його заповнюють sampleUrls (з вибірки)
+ * і parseTripSearch (з таблиці) — ядро викликає їх перед parse. Якщо parse викликати окремо (тест, одна
+ * адреса без списку), запасного джерела немає: звіт без `span.route` лишиться без нитки, і parse скаже
+ * про це попередженням (не мовчки). Тести, яким потрібна запасна нитка, спершу викликають parseTripSearch.
  */
 const listRoutes = new Map();
 
@@ -274,6 +279,13 @@ export default {
 
     const body = article.find('.field-name-body .field-item').first();
     const route = routeFromBody($, body) ?? listRoutes.get(pageUrl);
+    if (!route) {
+      warnings.push(
+        listRoutes.size
+          ? 'без нитки маршруту: немає ні на сторінці (span.route), ні в списку /trip_search'
+          : 'без нитки маршруту: на сторінці немає span.route, а запасне джерело — список /trip_search — не прочитано',
+      );
+    }
     unwrapAnchorLinks($, body);
     flattenLayoutTables($, body);
     const images = prepareBody($, body);

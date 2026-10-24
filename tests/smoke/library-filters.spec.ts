@@ -16,7 +16,7 @@ interface Report {
 }
 
 const reports: Report[] = reportRoutes.map((path) =>
-  YAML.parse(readFileSync(`src/content/reports/${path.replace('/library/', '')}.md`, 'utf8').split(/^---$/m)[1]),
+  YAML.parse(readFileSync(`src/content/reports/${path.slice('/library/'.length, -1)}.md`, 'utf8').split(/^---$/m)[1]),
 );
 
 const titlesWhere = (match: (r: Report) => boolean) => reports.filter(match).map((r) => r.title).sort();
@@ -34,7 +34,7 @@ test('Кавказ + 3 к.с.: лишаються тільки такі звіт
   const expected = titlesWhere((r) => !!r.regions?.includes('Кавказ') && r.grade === '3');
   expect(expected.length, 'у вибірці є звіти «Кавказ, 3 к.с.»').toBeGreaterThan(0);
 
-  await page.goto('/library');
+  await page.goto('/library/');
   await expect(count(page)).toHaveText(new RegExp(`^Усього ${reports.length} звіт(и|ів)?$`));
   await expect(cards(page).filter({ visible: true })).toHaveCount(reports.length);
 
@@ -60,7 +60,7 @@ test('Кавказ + 3 к.с.: лишаються тільки такі звіт
 });
 
 test('вид і рік комбінуються з районом; зняття фільтра повертає звіти', async ({ page }) => {
-  await page.goto('/library?region=Карпати&kind=пішохідний&year=2020');
+  await page.goto('/library/?region=Карпати&kind=пішохідний&year=2020');
   const expected = titlesWhere((r) => !!r.regions?.includes('Карпати') && r.kind === 'пішохідний' && r.year === 2020);
   expect(expected.length).toBeGreaterThan(0);
   expect(await visibleTitles(page)).toEqual(expected);
@@ -73,7 +73,7 @@ test('вид і рік комбінуються з районом; зняття 
 test('нічого не знайдено: порожній стан і «Скинути фільтри» повертає весь список', async ({ page }) => {
   // Гімалаї є лише з 6 к.с. — комбінація з 1 к.с. порожня.
   expect(titlesWhere((r) => !!r.regions?.includes('Гімалаї') && r.grade === '1')).toEqual([]);
-  await page.goto('/library');
+  await page.goto('/library/');
   await panel(page).getByLabel('Район').selectOption('Гімалаї');
   await panel(page).getByLabel('Категорія складності').selectOption('1');
 
@@ -90,18 +90,20 @@ test('нічого не знайдено: порожній стан і «Ски�
   expect(new URL(page.url()).search).toBe('');
 });
 
-test('невідомі значення в адресі ігноруються', async ({ page }) => {
-  await page.goto('/library?region=Марс&grade=9&utm=x');
+test('невідомі значення в адресі ігноруються й прибираються з адреси', async ({ page }) => {
+  await page.goto('/library/?region=Марс&grade=9&utm=x');
   await expect(cards(page).filter({ visible: true })).toHaveCount(reports.length);
   await expect(panel(page).getByLabel('Район')).toHaveValue('');
   await expect(count(page)).toHaveText(new RegExp(`^Усього ${reports.length} звіт(и|ів)?$`));
+  // Чужі параметри (utm) лишаються, невідомі значення фільтрів — ні.
+  await expect(page).toHaveURL(/\/library\/\?utm=x$/);
 });
 
 test.describe('без JavaScript', () => {
   test.use({ javaScriptEnabled: false });
 
   test('повний список, панелі фільтрів і порожнього стану не видно', async ({ page }) => {
-    await page.goto('/library?region=Кавказ&grade=3');
+    await page.goto('/library/?region=Кавказ&grade=3');
     await expect(cards(page)).toHaveCount(reports.length);
     await expect(cards(page).filter({ visible: true })).toHaveCount(reports.length);
     await expect(page.locator('[data-component="FilterPanel"] form')).toBeHidden();
@@ -113,7 +115,7 @@ test.describe('телефон', () => {
   test.use({ viewport: { width: 375, height: 740 } });
 
   test('поля згорнуті під кнопку «Фільтри», лічильник видно', async ({ page }) => {
-    await page.goto('/library?kind=гірський');
+    await page.goto('/library/?kind=гірський');
     const toggle = panel(page).getByRole('button', { name: /^Фільтри/ });
     await expect(toggle).toBeVisible();
     await expect(toggle).toHaveText('Фільтри · 1');
@@ -133,7 +135,7 @@ test.describe('телефон', () => {
 });
 
 test('на компʼютері поля видно одразу, кнопки «Фільтри» немає', async ({ page }) => {
-  await page.goto('/library');
+  await page.goto('/library/');
   await expect(panel(page).getByLabel('Район')).toBeVisible();
   await expect(panel(page).getByRole('button', { name: /^Фільтри/ })).toBeHidden();
   await expect(panel(page).getByRole('button', { name: 'Скинути фільтри' })).toBeHidden();
