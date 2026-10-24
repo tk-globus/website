@@ -1,0 +1,169 @@
+---
+// Панель фільтрів списку (бібліотека звітів): випадні списки полів, лічильник «Знайдено 3 звіти з 44»,
+// «Скинути фільтри» і порожній стан. Список — у слоті; кожен запис, що фільтрується, має на корені
+// data-filter-values (JSON { поле: [значення] }, напр. ReportCard з filterValues).
+// Фільтри комбінуються (запис має підходити за всіма вибраними полями). Вибір пишеться в адресу
+// (?region=Кавказ&grade=3, без нової історії), тож посиланням можна поділитися — воно відкриє ту саму вибірку.
+// Без JavaScript панелі не видно, список повний (фільтри — поліпшення поверх).
+// На телефоні поля згорнуті під кнопку «Фільтри»; лічильник і «Скинути фільтри» видно завжди.
+import Button from './Button.astro';
+import EmptyState from './EmptyState.astro';
+import Icon from './Icon.astro';
+import type { FilterField } from '../lib/filters';
+import type { PluralForms } from '../lib/plural';
+
+interface Props {
+  fields: FilterField[];
+  /** Назва панелі для скрінрідера: «Фільтри звітів». */
+  label: string;
+  /** Форми слова для лічильника: ['звіт', 'звіти', 'звітів']. */
+  nouns: PluralForms;
+  /** Порожній стан, коли нічого не знайдено. */
+  emptyTitle: string;
+  emptyText?: string;
+  /** Рівень заголовка порожнього стану — як у карток списку. */
+  headingLevel?: 2 | 3;
+  /** Префікс id елементів (якщо панелей кілька на сторінці). */
+  id?: string;
+}
+
+const { fields, label, nouns, emptyTitle, emptyText, headingLevel = 3, id = 'filters' } = Astro.props;
+const fieldsId = `${id}-fields`;
+---
+
+<div data-component="FilterPanel" data-filter-root data-fields={JSON.stringify(fields)} data-nouns={JSON.stringify(nouns)}>
+  <form
+    data-filter-form
+    aria-label={label}
+    autocomplete="off"
+    class="mb-8 rounded-lg border border-line/soft bg-surface p-4 md:p-6"
+    hidden
+  >
+    <div class="flex flex-wrap items-center gap-3">
+      <p data-filter-count aria-live="polite" class="mr-auto font-semibold text-ink"></p>
+      <span data-filter-reset="panel" hidden>
+        <Button variant="secondary">Скинути фільтри</Button>
+      </span>
+      <button
+        type="button"
+        data-filter-toggle
+        aria-expanded="false"
+        aria-controls={fieldsId}
+        class="inline-flex shrink-0 items-center gap-2 rounded-md border border-line bg-paper px-3 py-2 text-sm font-semibold text-ink hover:bg-brand-soft md:hidden"
+      >
+        <Icon name="filter" size={18} />
+        <span data-filter-toggle-label>Фільтри</span>
+      </button>
+    </div>
+    <div id={fieldsId} data-filter-fields class="mt-4 grid gap-4 max-md:hidden sm:grid-cols-2 lg:grid-cols-4">
+      {
+        fields.map((field) => (
+          <label class="flex flex-col gap-1 text-sm font-semibold text-ink">
+            {field.label}
+            <select
+              name={field.name}
+              class="w-full rounded-md border border-line bg-paper px-3 py-2 text-base font-normal text-ink"
+            >
+              <option value="">{field.anyLabel}</option>
+              {field.options.map((option) => (
+                <option value={option.value}>{option.label}</option>
+              ))}
+            </select>
+          </label>
+        ))
+      }
+    </div>
+  </form>
+
+  <div data-filter-list>
+    <slot />
+  </div>
+
+  <div data-filter-empty hidden>
+    <EmptyState title={emptyTitle} text={emptyText} headingLevel={headingLevel}>
+      <span data-filter-reset="empty">
+        <Button variant="secondary">Скинути фільтри</Button>
+      </span>
+    </EmptyState>
+  </div>
+</div>
+
+<script>
+  import {
+    matchesFilters,
+    searchWithSelection,
+    selectionFromSearch,
+    type FilterField,
+    type FilterSelection,
+    type FilterValues,
+  } from '../lib/filters';
+  import { pluralCount, type PluralForms } from '../lib/plural';
+
+  for (const root of document.querySelectorAll<HTMLElement>('[data-filter-root]')) {
+    const fields: FilterField[] = JSON.parse(root.dataset.fields ?? '[]');
+    const nouns: PluralForms = JSON.parse(root.dataset.nouns ?? '[]');
+    const form = root.querySelector<HTMLFormElement>('[data-filter-form]');
+    const list = root.querySelector<HTMLElement>('[data-filter-list]');
+    const empty = root.querySelector<HTMLElement>('[data-filter-empty]');
+    const count = root.querySelector<HTMLElement>('[data-filter-count]');
+    const toggle = root.querySelector<HTMLButtonElement>('[data-filter-toggle]');
+    const fieldsBox = root.querySelector<HTMLElement>('[data-filter-fields]');
+    if (!form || !list || !empty || !count || !toggle || !fieldsBox) continue;
+
+    const selects = [...form.querySelectorAll<HTMLSelectElement>('select')];
+    const panelReset = root.querySelector<HTMLElement>('[data-filter-reset="panel"]');
+    const toggleLabel = toggle.querySelector('[data-filter-toggle-label]');
+    const items = [...list.querySelectorAll<HTMLElement>('[data-filter-values]')].map((el) => ({
+      el,
+      values: JSON.parse(el.dataset.filterValues ?? '{}') as FilterValues,
+    }));
+
+    const selection = (): FilterSelection =>
+      Object.fromEntries(selects.filter((select) => select.value).map((select) => [select.name, select.value]));
+
+    // Показує записи, що підходять, лічильник і порожній стан; за потреби — пише вибір в адресу.
+    const apply = (updateUrl: boolean) => {
+      const selected = selection();
+      const active = Object.keys(selected).length;
+      let shown = 0;
+      for (const item of items) {
+        const match = matchesFilters(item.values, selected);
+        item.el.hidden = !match;
+        if (match) shown++;
+      }
+      list.hidden = shown === 0;
+      empty.hidden = shown > 0;
+      count.textContent = active
+        ? `Знайдено ${pluralCount(shown, nouns)} з ${items.length}`
+        : `Усього ${pluralCount(items.length, nouns)}`;
+      if (panelReset) panelReset.hidden = active === 0;
+      if (toggleLabel) toggleLabel.textContent = active ? `Фільтри · ${active}` : 'Фільтри';
+      if (updateUrl) {
+        const url = new URL(window.location.href);
+        url.search = searchWithSelection(url.search, fields, selected);
+        history.replaceState(history.state, '', url);
+      }
+    };
+
+    const fromUrl = selectionFromSearch(window.location.search, fields);
+    for (const select of selects) select.value = fromUrl[select.name] ?? '';
+    apply(false);
+    form.hidden = false;
+
+    form.addEventListener('change', () => apply(true));
+    form.addEventListener('submit', (event) => event.preventDefault());
+    // «Скинути фільтри»: кнопка зникає разом із вибором, тож фокус переходить на панель (не губиться).
+    for (const reset of root.querySelectorAll<HTMLElement>('[data-filter-reset]')) {
+      reset.querySelector('button')?.addEventListener('click', () => {
+        for (const select of selects) select.value = '';
+        apply(true);
+        (toggle.offsetParent ? toggle : selects[0])?.focus();
+      });
+    }
+    toggle.addEventListener('click', () => {
+      const open = toggle.getAttribute('aria-expanded') !== 'true';
+      toggle.setAttribute('aria-expanded', String(open));
+      fieldsBox.classList.toggle('max-md:hidden', !open);
+    });
+  }
+</script>
