@@ -1,0 +1,176 @@
+---
+// Календар подій по місяцях: сітка тижнів з понеділка, події — у своїх днях (багатоденна — у кожному),
+// кнопки «попередній / наступний місяць». Видно один місяць; спочатку — поточний (за київським часом),
+// або той, що в адресі (`?month=2026-10`), — посилання відкриває той самий місяць.
+// На телефоні назв у клітинках не видно (лише позначка), а під сіткою — список подій місяця.
+// Дані — calendarMonths() з src/lib/events.ts.
+import Icon from './Icon.astro';
+import type { CalendarMonth } from '../lib/events';
+
+interface Props {
+  months: CalendarMonth[];
+  /** Місяць, видимий до запуску скрипта: `2026-10`. */
+  initial: string;
+  headingLevel?: 2 | 3;
+}
+
+const { months, initial, headingLevel = 2 } = Astro.props;
+const Heading = `h${headingLevel}` as const;
+const ListHeading = `h${headingLevel + 1}` as const;
+const weekdays = [
+  ['Пн', 'понеділок'],
+  ['Вт', 'вівторок'],
+  ['Ср', 'середа'],
+  ['Чт', 'четвер'],
+  ['Пт', 'пʼятниця'],
+  ['Сб', 'субота'],
+  ['Нд', 'неділя'],
+];
+const labelOf = (key?: string) => months.find((m) => m.key === key)?.label;
+const navButton =
+  'inline-flex size-10 shrink-0 items-center justify-center rounded-md border-thick border-brand text-brand transition-colors hover:bg-brand-soft disabled:cursor-not-allowed disabled:opacity-disabled disabled:hover:bg-paper';
+---
+
+<div data-component="EventCalendar" data-event-calendar>
+  {
+    months.map((month) => (
+      <section data-month={month.key} aria-labelledby={`calendar-${month.key}`} hidden={month.key !== initial}>
+        <div class="mb-4 flex items-center justify-between gap-4">
+          <button
+            type="button"
+            class={navButton}
+            data-calendar-go={month.prev}
+            disabled={!month.prev}
+            aria-label={month.prev ? `Попередній місяць: ${labelOf(month.prev)}` : 'Попереднього місяця немає'}
+          >
+            <Icon name="chevron-left" size={20} />
+          </button>
+          <Heading id={`calendar-${month.key}`} tabindex="-1" class="text-center text-2xl font-bold text-ink">
+            {month.label}
+          </Heading>
+          <button
+            type="button"
+            class={navButton}
+            data-calendar-go={month.next}
+            disabled={!month.next}
+            aria-label={month.next ? `Наступний місяць: ${labelOf(month.next)}` : 'Наступного місяця немає'}
+          >
+            <Icon name="chevron-right" size={20} />
+          </button>
+        </div>
+
+        <table class="w-full table-fixed border-collapse bg-paper">
+          <thead>
+            <tr>
+              {weekdays.map(([short, full]) => (
+                <th scope="col" class="pb-2 text-xs font-semibold text-muted">
+                  <abbr title={full} class="no-underline">
+                    {short}
+                  </abbr>
+                </th>
+              ))}
+            </tr>
+          </thead>
+          <tbody>
+            {month.weeks.map((week) => (
+              <tr>
+                {week.map((day) => (
+                  <td
+                    data-date={day.date}
+                    aria-current={day.isToday ? 'date' : undefined}
+                    class:list={[
+                      'h-14 border border-line/soft p-1 align-top sm:h-28 sm:p-2',
+                      day.inMonth ? 'bg-paper' : 'bg-surface',
+                    ]}
+                  >
+                    <span
+                      class:list={[
+                        'flex size-7 items-center justify-center rounded-full text-sm',
+                        day.isToday && 'bg-brand font-bold text-on-brand',
+                        !day.isToday && (day.inMonth ? 'text-ink' : 'text-muted'),
+                      ]}
+                    >
+                      {day.day}
+                    </span>
+                    {day.events.length > 0 && (
+                      <>
+                        <span aria-hidden="true" class="mx-auto mt-1 block size-2 rounded-full bg-brand sm:hidden" />
+                        <ul class="mt-1 hidden space-y-1 sm:block">
+                          {day.events.map((event) => (
+                            <li>
+                              <a
+                                href={event.href}
+                                title={`${event.title} — ${event.when}`}
+                                class="line-clamp-3 rounded-sm bg-brand-soft px-1 text-xs font-semibold text-brand-dark transition-colors hover:bg-brand hover:text-on-brand"
+                              >
+                                {event.title}
+                              </a>
+                            </li>
+                          ))}
+                        </ul>
+                      </>
+                    )}
+                  </td>
+                ))}
+              </tr>
+            ))}
+          </tbody>
+        </table>
+
+        <div class="mt-6 sm:hidden">
+          <ListHeading class="text-lg font-bold text-ink">Події місяця</ListHeading>
+          {month.events.length ? (
+            <ul class="mt-3 space-y-3">
+              {month.events.map((event) => (
+                <li>
+                  <a href={event.href} class="font-semibold text-brand hover:text-brand-dark">
+                    {event.title}
+                  </a>
+                  <p class="text-sm text-muted">{event.when}</p>
+                </li>
+              ))}
+            </ul>
+          ) : (
+            <p class="mt-3 text-muted">У цьому місяці подій немає.</p>
+          )}
+        </div>
+      </section>
+    ))
+  }
+</div>
+
+<script>
+  // Показує один місяць; кнопки гортають місяці. Спочатку — місяць з адреси (?month=) або поточний за Києвом
+  // (якщо він поза календарем — найближчий крайній). Гортання пише місяць в адресу (replaceState).
+  const monthNow = new Intl.DateTimeFormat('en-CA', { timeZone: 'Europe/Kyiv', year: 'numeric', month: '2-digit' })
+    .format(new Date())
+    .slice(0, 7);
+
+  for (const calendar of document.querySelectorAll<HTMLElement>('[data-event-calendar]')) {
+    const months = [...calendar.querySelectorAll<HTMLElement>('[data-month]')];
+    const keys = months.map((m) => m.dataset.month ?? '');
+    if (!keys.length) continue;
+
+    const show = (key: string, updateUrl: boolean) => {
+      for (const month of months) month.hidden = month.dataset.month !== key;
+      if (updateUrl) {
+        const url = new URL(window.location.href);
+        url.searchParams.set('month', key);
+        history.replaceState(history.state, '', url);
+      }
+    };
+
+    const clamp = (key: string) => (key < keys[0] ? keys[0] : key > keys[keys.length - 1] ? keys[keys.length - 1] : key);
+    const fromUrl = new URL(window.location.href).searchParams.get('month');
+    show(fromUrl && keys.includes(fromUrl) ? fromUrl : clamp(monthNow), false);
+
+    calendar.addEventListener('click', (event) => {
+      const button = (event.target as Element).closest<HTMLButtonElement>('[data-calendar-go]');
+      const key = button?.dataset.calendarGo;
+      if (!button || button.disabled || !key) return;
+      show(key, true);
+      // Кнопка, яку натиснули, сховалась разом зі своїм місяцем — фокус на заголовок нового місяця.
+      calendar.querySelector<HTMLElement>(`#calendar-${key}`)?.focus();
+    });
+  }
+</script>

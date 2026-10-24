@@ -76,13 +76,15 @@ function imageFileName(src, taken) {
 const toPosix = (p) => p.split(sep).join('/');
 
 /**
- * Імпорт одного запису. Повертає { slug, file, status: created | updated | unchanged, warnings }.
+ * Імпорт одного запису. Повертає { slug, file, status: created | updated | unchanged | skipped, warnings }.
  * @param {object} type тип контенту (scripts/import/types/)
  * @param {string} url адреса сторінки на старому сайті
  * @param {{ root: string, fetcher: object, index: object }} ctx
  */
 export async function importItem(type, url, { root, fetcher, index }) {
   const parsed = type.parse(await fetcher.text(url), url);
+  // Парсер може свідомо пропустити запис (порожня чернетка на старому сайті) — це не помилка імпорту.
+  if (parsed.skip) return { slug: null, file: null, status: 'skipped', reason: parsed.skip, warnings: [], unrecognized: [] };
   // Парсер може повернути власні попередження і значення, яких немає в переліках схеми (звіти).
   const unrecognized = parsed.unrecognized ?? [];
   const warnings = [
@@ -207,6 +209,10 @@ export async function runImport(type, { root, fetcher, scope = 'sample', limit, 
     try {
       const result = await importItem(type, url, { root, fetcher, index });
       results.push({ url, ...result });
+      if (result.status === 'skipped') {
+        log(`- пропущено  ${url}: ${result.reason}`);
+        continue;
+      }
       log(`${{ created: '+ нове', updated: '~ оновлено', unchanged: '= без змін' }[result.status]}  ${result.file}`);
       for (const w of result.warnings) log(`    ! ${w}`);
     } catch (e) {
